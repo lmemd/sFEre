@@ -1,4 +1,4 @@
-from FE_mesh.batch_creation import mesh_generator
+from FE_mesh.configure_shots_mesh import mesh_generator
 from sphere_generator.shot_stream_generator import shot_stream
 from sphere_generator.utilities import *
 

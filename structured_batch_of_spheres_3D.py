@@ -1,4 +1,4 @@
-from FE_mesh.batch_creation import mesh_generator
+from FE_mesh.configure_shots_mesh import mesh_interface
 from sphere_generator.shot_stream_generator import shot_stream
 from sphere_generator.utilities import *
 
@@ -19,7 +19,7 @@ def main():
     element_length = 0.04
 
     spheres = shot_stream.structured_spheres(coordinates,radii)
-    mesh_generator("spherified_cube", "nonlinear", spheres, element_length, filename, output_option = "LSDYNA") # process and output of meshed generated spheres
+    mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, output_option = "LSDYNA") # process and output of meshed generated spheres
 
     # Print the X,Y coordinates and the radii of created spheres
     list_to_print = ['%.4f'%s.x + '    ' +  '%.4f'%s.y + '   ' +  '%.4f'%s.z + '    ' +  '%.4f'%s.r for s in spheres]

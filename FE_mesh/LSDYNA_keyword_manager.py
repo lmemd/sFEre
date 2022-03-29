@@ -1,6 +1,6 @@
 import numpy as np
 import os
-from FE_mesh.sphere_mesh_utils import working_directory, merge_txt_files
+from FE_mesh.utilities import working_directory, merge_txt_files
 
 
 def section(PID, MID = 1000000, ELFORM = 1):
@@ -164,7 +164,7 @@ def output_general_file(nodes_s, elements_s, filename, ending = ".txt"):
     os.chdir(change_path)
 
     
-def apply_initial_velocity(filename, user_initial_velocity, angle = 90, pid = 1):
+def apply_initial_velocity(filename, user_initial_velocity, angle, pid = 1):
     """Applies (or not) initial velocity to sphere entities.
     ONLY FOR LSDYNA file form!!!
 

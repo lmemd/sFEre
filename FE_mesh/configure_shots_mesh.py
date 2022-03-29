@@ -1,11 +1,11 @@
 import numpy as np
 import sys 
 import sphere_generator
-from FE_mesh.sphere_creation import sphere_entity
+from FE_mesh.configure_sphere_entity import sphere_entity
 from FE_mesh.LSDYNA_keyword_manager import output_keyword_file, output_general_file
 
 
-def mesh_generator(mesh_method, spacing_method, spheres, element_length, filename, output_option, pid = 1, renumbering_point = 0):
+def mesh_interface(mesh_method, spacing_method, spheres, element_length, filename, output_option, pid = 1, renumbering_point = 0):
     """Generates a batch with multiple spheres, based on given positions,
     radiuses and other characteristics included in the analysis.
 
@@ -45,25 +45,6 @@ def mesh_generator(mesh_method, spacing_method, spheres, element_length, filenam
             nodes_all = np.vstack((nodes_all, nodes_s_tmp))
             elements_all = np.vstack((elements_all, elements_s_tmp))
 
-        # deleting useless first row of matrices
-        nodes_all = np.delete(nodes_all, 0, 0)
-        elements_all = np.delete(elements_all, 0, 0)
-        
-        nodes_all[:, 0] += renumbering_point
-        elements_all[:, 0] += renumbering_point
-        elements_all[:, 2:] += renumbering_point
-
-        if output_option == "general":
-            output_general_file(nodes_all, elements_all, filename)
-        elif output_option == "LSDYNA":
-            output_keyword_file(nodes_all, elements_all, pid, filename)
-        else:
-            pass
-
-        # appending nodes and elements matrices
-        nodes_all = np.vstack((nodes_all, nodes_s_tmp))
-        elements_all = np.vstack((elements_all, elements_s_tmp))
-        
         # deleting useless first row of matrices
         nodes_all = np.delete(nodes_all, 0, 0)
         elements_all = np.delete(elements_all, 0, 0)

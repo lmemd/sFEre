@@ -1,4 +1,4 @@
-from FE_mesh.batch_creation import mesh_generator
+from FE_mesh.configure_shots_mesh import mesh_interface
 from FE_mesh.LSDYNA_keyword_manager import apply_initial_velocity
 from sphere_generator.shot_stream_generator import shot_stream
 from sphere_generator.utilities import *
@@ -37,18 +37,17 @@ def main():
         # Generate stream of random distributed shots in space
         stream = shot_stream(spheres_number, problem_dimensions, box, box_angle, mean_radius, radius_std)
         spheres = stream.generate() # Create the stream
+        
+        # Change the filename according to current index of set number
         filename = f"{filename}_{set_number + 1}"
         
         # Define FE mesh and spacing method
-
         # process and output of meshed generated spheres
+        mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, "LSDYNA")
 
-        mesh_generator("spherified_cube", "nonlinear", spheres, element_length, filename, "LSDYNA")
-
-        # apply initial velocity or not, default is not
-        # else, set initial_velocity to desired quantity
-
-        apply_initial_velocity(filename, user_initial_velocity=12)
+        # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
+        # Currently, an absolute initial velocity of 70 m/s will be applied.
+        apply_initial_velocity(filename, 70, box_angle)
 
         spheres_list.extend(spheres)
 

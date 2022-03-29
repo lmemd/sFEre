@@ -4,7 +4,7 @@ import sympy as sym
 import sys 
 sys.path.append('../sFEre')
 
-from FE_mesh.sphere_creation import sphere_entity
+from FE_mesh.configure_sphere_entity import sphere_entity
 
 class sphere_dims:
     def __init__(self, x, y, z, r):
