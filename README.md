@@ -240,7 +240,7 @@ Also, it uses lesser elements for nearly same-sized spheres, contrary to the nor
 
 ## **Installation**
 
-In **_requirements.txt_** file, are located the necessary python libraries. In order to install them, simply run in terminal:
+Necessary python libraries are located inside **_requirements.txt_**. In order to install them, simply run in terminal:
 ```
 pip install -r requirements.txt
 ```
