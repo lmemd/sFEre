@@ -1,4 +1,4 @@
-<img src=https://user-images.githubusercontent.com/49105794/160369992-75072975-ba97-4c2a-b7b1-324749e7c9cb.png />
+<img src=https://user-images.githubusercontent.com/49105794/160626739-4a59b7f9-8d7b-43f0-ae3e-71a015e293ab.png />
 
 ## Authors
 
