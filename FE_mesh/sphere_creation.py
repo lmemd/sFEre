@@ -4,7 +4,7 @@ import sys
 sys.path.append('../sFEre')
 
 from FE_mesh.sphere_mesh import element_length_translator, create_elements, spacing, renumbering_element_pairs
-from FE_mesh.lsdyna_keywords_utils import output_keyword_file
+from FE_mesh.LSDYNA_keyword_manager import output_keyword_file
 
 
 def mesh_configuration(mesh_method, spacing_method, radius, element_length):

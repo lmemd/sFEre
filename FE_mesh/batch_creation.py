@@ -2,7 +2,7 @@ import numpy as np
 import sys 
 import sphere_generator
 from FE_mesh.sphere_creation import sphere_entity
-from FE_mesh.lsdyna_keywords_utils import output_keyword_file, output_general_file
+from FE_mesh.LSDYNA_keyword_manager import output_keyword_file, output_general_file
 
 
 def mesh_generator(mesh_method, spacing_method, spheres, element_length, filename, output_option, pid = 1, renumbering_point = 0):
