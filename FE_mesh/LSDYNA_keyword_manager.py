@@ -92,9 +92,9 @@ def output_keyword_file(nodes_s, elements_s, pid, filename, velocity = [], angle
         merge_txt_files(filenames,'%s.k' %filename)
     else:
         merge_txt_files(filenames[0:-1], '%s.k' %filename)
-        with open('%s.k' %filename, "a+") as f:
+        """with open('%s.k' %filename, "a+") as f:
             f.write("*END")
-        f.close()
+        f.close()""" # under investigation (if *END is needed at the end of the .k file)
 
     os.remove('nodes.txt')
     os.remove('elements.txt')
@@ -185,11 +185,19 @@ def apply_initial_velocity(filename, user_initial_velocity, angle, pid = 1):
         if os.path.exists(f"{filename}.k"):
             initial_velocity(pid, user_initial_velocity, angle)
             with open("initial_velocity.txt", "r+") as f:
-                lines = f.read()
+                text = f.read()
             f.close()
             with open(f"{filename}.k", "a+") as fout:
-                fout.write(lines)
+                fout.write(text)
             fout.close()
+            """with open(f"{filename}.k", "r+") as fout:
+                text = fout.read()
+                if "*END" in text:
+                    text = text.replace("*END", lines)
+            fout.close()
+            with open(f"{filename}.k", "w+") as fout:
+                fout.write(text)
+            fout.close()""" # under investigation (if *END is needed at the end of the .k file)
             os.remove("initial_velocity.txt")
         else:
             print("Initial velocity can only be applied for LS-DYNA file forms.")
