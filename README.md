@@ -73,7 +73,7 @@ The sphere will be then extracted, in a file using *_LS-Dyna_* format.
     
   ```python
   from sphere_generator.sphere import sphere_3D
-  from sphere_generator import shot_stream
+  from sphere_generator.shot_stream_generator import shot_stream
   from FE_mesh.configure_shots_mesh import mesh_interface
 
 
@@ -111,7 +111,7 @@ The sphere will be then extracted, in a file using *_LS-Dyna_* format.
   
   ```python
   from sphere_generator.sphere import sphere_3D
-  from sphere_generator import shot_stream
+  from sphere_generator.shot_stream_generator import shot_stream
   from FE_mesh.configure_shots_mesh import mesh_interface
 
 
@@ -162,8 +162,8 @@ with a mean radius of 0.5 mm, and a standard deviation of 0.3 mm. Then, an LS-Dy
       #**************************************INPUT SECTION******************************************
       filename = "demo_batch_of_spheres" # name of sphere file
       mean_radius = 0.5 # average radius of created sphere
-      radius_std = 0.2 # standard deviation of radius for the created sphere
-      spheres_number = 10 # total number of sphere created
+      radius_std = 0.3 # standard deviation of radius for the created sphere
+      spheres_number = 40 # total number of sphere created
       spheres_batches = 1 # change this variable if you want to create more than one batch of shots
 
       # Define FE length for spheres
@@ -172,7 +172,7 @@ with a mean radius of 0.5 mm, and a standard deviation of 0.3 mm. Then, an LS-Dy
       # Define the domain characteristics (the space that contains the created spheres)
       box_width = 2 # width of the domain containing the spheres (alongside X axis)
       box_length = 2 # length of the domain containing the spheres (alongside Z axis)
-      box_height = 5 # height of the domain containing the spheres (alongside Y axis)
+      box_height = 2 # height of the domain containing the spheres (alongside Y axis)
       box_angle = 90 # change this value if you want an inlcined box (defined by the angle between the box and the XZ plane)
 
       # Define if your problem is in 2 dimensional or 3 dimensional space (2D or 3D)
