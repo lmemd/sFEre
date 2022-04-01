@@ -1,25 +1,29 @@
 class generic_box:
     """
-    This class describes the modeled sphere, either it is in 2 or 3 dimensions,
+    This class describes a generic box embedded in a n-dimensional space.
     """
-    
-    dim_x = 0
-    dim_y = 0
-    dim_z = 0
-    
+    #TODO modify so that the box can have arbitrary size, position and orientation
+    def __init__(self,ndim = 3, sides = (0,0,0)):
+        self.ndim   = ndim
+        self.sides  = sides
 
-    def __init__(self,dim_x = 0, dim_y = 0, dim_z = 0):
-        
-        self.dim_x = dim_x
-        self.dim_y = dim_y
-        self.dim_z = dim_z
-        
-class box_2D(generic_box): #TODO implement properly
+    @property
+    def dim_x(self):
+        return self.sides[0]
+    
+    @property
+    def dim_y(self):
+        return self.sides[1]
 
-    def __init__(self,dim_xx,dim_yy):
-        super().__init__(dim_xx,dim_yy,0)
+    @property
+    def dim_x(self):
+        return self.sides[2]
         
-class box_3D(generic_box):
-    def __init__(self,dim_xx,dim_yy,dim_zz):
-        super().__init__(dim_xx,dim_yy,dim_zz)
+class box_2D(generic_box): #TODO refactor all code referencing it and delete
+    def __init__(self,dim_x,dim_y):
+        super().__init__(ndim=2, sides=(dim_x,dim_y))
+        
+class box_3D(generic_box): #TODO refactor all code referencing it and delete
+    def __init__(self,dim_x,dim_y,dim_z):
+        super().__init__(ndim=3, sides=(dim_x,dim_y,dim_z))
 
