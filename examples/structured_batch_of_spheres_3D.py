@@ -3,7 +3,6 @@ sys.path.append('../')
 
 from FE_mesh.configure_shots_mesh import mesh_interface
 from sphere_generator.shot_stream_generator import shot_stream
-from sphere_generator.utilities import *
 
 
 def main():
