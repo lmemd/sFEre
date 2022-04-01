@@ -4,27 +4,22 @@ class generic_sphere:
     """
     This class describes the modeled sphere, either it is in 2 or 3 dimensions,
     """
-    
-    x = 0
-    y = 0
-    z = 0
-    r = 0
 
-    def __init__(self,xx,yy,zz,rr):
+    def __init__(self, x =0, y = 0, z = 0, r = 0):
         """Initialization of the sphere and the dimenstions that it exists
 
         Args:
-            xx (float): x coordinate of the center
-            yy (float): y coordinate of the center
-            zz (float): z coordinate of the center
-            rr (float): radius of the sphere
+            x (float): x coordinate of the center
+            y (float): y coordinate of the center
+            z (float): z coordinate of the center
+            r (float): radius of the sphere
             dimension (int): The dimensions that the sphere exists (2D or 3D space)
         """
 
-        self.x = xx
-        self.y = yy
-        self.z = zz
-        self.r = rr
+        self.x = x
+        self.y = y
+        self.z = z
+        self.r = r
     
     def volume(self):
         pass
