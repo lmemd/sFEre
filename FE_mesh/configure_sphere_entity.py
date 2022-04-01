@@ -136,37 +136,3 @@ def sphere_entity(mesh_method, spacing_method, radius, element_length, position_
     print('\x1b[1;37;45m' + "Element length (approximately): %f mm. ***" %real_element_length + '\x1b[0m')
 
     return sphere_entity
-
-
-"""def main():
-    start = time.time()
-
-    shots_name = "sphere_ent"
-    radius = 0.4
-    element_length = 0.03
-    position_x = 0
-    position_y = 0
-    position_z = 0
-    pid = 1000000
-    velocity = 100
-    angle = 90
-
-    sphere = sphere_entity(radius, element_length, position_x, position_y, position_z, pid)
-    nodes_s = sphere[0]
-    elements_s = sphere[1]
-
-    renumbering_rule = 10000000
-
-    nodes_s[:, 0] += renumbering_rule
-    elements_s[:, 0] += renumbering_rule
-    elements_s[:, 2:] += renumbering_rule
-
-    output_keyword_file(nodes_s, elements_s, shots_name, pid, velocity, angle)
-
-    end = time.time()
-
-    print('\x1b[1;37;45m' + "*** Execution time: %f seconds. ***" %(end - start) + '\x1b[0m')
-
-
-if __name__ == "__main__":
-    main()"""
