@@ -1,4 +1,4 @@
-class generic_box:
+class Box:
     """
     This class describes a generic box embedded in a n-dimensional space.
     """
@@ -19,11 +19,11 @@ class generic_box:
     def dim_x(self):
         return self.sides[2]
         
-class box_2D(generic_box): #TODO refactor all code referencing it and delete
+class box_2D(Box): #TODO refactor all code referencing it and delete
     def __init__(self,dim_x,dim_y):
         super().__init__(ndim=2, sides=(dim_x,dim_y))
         
-class box_3D(generic_box): #TODO refactor all code referencing it and delete
+class box_3D(Box): #TODO refactor all code referencing it and delete
     def __init__(self,dim_x,dim_y,dim_z):
         super().__init__(ndim=3, sides=(dim_x,dim_y,dim_z))
 

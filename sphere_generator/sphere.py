@@ -1,6 +1,6 @@
 import math
 
-class generic_sphere:
+class Sphere:
     """
     This class describes a generic sphere embedded in a n-dimensional space
     """
@@ -44,10 +44,10 @@ class generic_sphere:
             return (4/3)*math.pi*(self.r**3)
             
 
-class sphere_2D(generic_sphere): #TODO refactor all code referencing it and delete
+class sphere_2D(Sphere): #TODO refactor all code referencing it and delete
     def __init__(self,x,y,radius):
         super().__init__(ndim = 2, center = (x,y), r = radius)
     
-class sphere_3D(generic_sphere): #TODO refactor all code referencing it and delete
+class sphere_3D(Sphere): #TODO refactor all code referencing it and delete
     def __init__(self,x,y,z,radius):
         super().__init__(ndim = 3, center = (x,y,z), r = radius)
