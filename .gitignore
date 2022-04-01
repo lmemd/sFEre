@@ -1,0 +1,20 @@
+# ignore all files
+*
+
+
+# Except:
+!.gitignore
+
+!*.py         # all python files in root dir
+!FE_mesh/*.py # all python files in subdirs 
+!sphere_generator/*.py 
+
+
+!LICENSE.md
+!README.md
+!requirements.txt
+
+
+
+
+
