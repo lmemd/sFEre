@@ -1,3 +1,6 @@
+import sys 
+sys.path.append('../')
+
 from FE_mesh.configure_shots_mesh import mesh_interface
 from FE_mesh.LSDYNA_keyword_manager import apply_initial_velocity
 from sphere_generator.shot_stream_generator import shot_stream

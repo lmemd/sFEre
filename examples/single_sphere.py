@@ -1,3 +1,6 @@
+import sys 
+sys.path.append('../')
+
 from sphere_generator.sphere import sphere_3D
 from sphere_generator.shot_stream_generator import shot_stream
 from FE_mesh.configure_shots_mesh import mesh_interface
