@@ -3,7 +3,7 @@ sys.path.append('../')
 
 from FE_mesh.configure_shots_mesh import mesh_generator
 from sphere_generator.shot_stream_generator import shot_stream
-from sphere_generator.utilities import *
+from sphere_generator.box import *
 
 
 def main():
@@ -28,8 +28,8 @@ def main():
 
     #****************FE sphere mesh is not implemented if problem is 2D****************
 
-    problem_dimensions = problem_dimensions_setter("2D") # Input 2D or 3D according to your problem dimensions
-    box = box_getter(problem_dimensions,box_width,box_height,box_length) # create the box 
+    problem_dimensions = 2 # Input 2D or 3D according to your problem dimensions
+    box = generic_box(ndim=problem_dimensions, sides= (box_width,box_height,box_length) ) # create the box 
 
     #***********************************END OF INPUT SECTION**************************************
 
