@@ -19,25 +19,17 @@ class shot_stream:
        mean_diameter (float) : The average diameter of the shots
        diameter_standard_deviation (float) : The standard deviation of the diameter
     """
-    
-    number_of_spheres = 1
-    problem_dimensions = 0
-    domain_dimensions = None
-    impact_angle = 0
-    box_offset_dists = (0,0,0)
-    mean_diameter = 0 
-    diameter_standard_deviation = 0
 
-    def __init__(self,number_of_spheres_setter,problem_dimensions_setter,domain_dimensions_setter,impact_angle_setter, mean_diameter_setter, diameter_standard_deviation_setter,box_offset_dists_setter=(0,0,0)):
+    def __init__(self,number_of_spheres = 1,problem_dimensions = 0,domain_dimensions = None, impact_angle = 0, mean_diameter = 0, diameter_standard_deviation = 0,box_offset_dists = (0,0,0)):
         """Initialize attributes with given values
         """
-        self.number_of_spheres = number_of_spheres_setter
-        self.problem_dimensions = problem_dimensions_setter
-        self.domain_dimensions = domain_dimensions_setter
-        self.impact_angle = impact_angle_setter
-        self.box_offset_dists = box_offset_dists_setter
-        self.mean_diameter = mean_diameter_setter
-        self.diameter_standard_deviation = diameter_standard_deviation_setter
+        self.number_of_spheres = number_of_spheres
+        self.problem_dimensions = problem_dimensions
+        self.domain_dimensions = domain_dimensions
+        self.impact_angle = impact_angle
+        self.box_offset_dists = box_offset_dists
+        self.mean_diameter = mean_diameter
+        self.diameter_standard_deviation = diameter_standard_deviation
         
     
     def random_sphere_inside_box(self,r):

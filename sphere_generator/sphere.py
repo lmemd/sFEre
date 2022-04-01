@@ -47,7 +47,7 @@ class sphere_3D(generic_sphere):
         super().__init__(xx,yy,zz,rr)
            
     def volume(self):
-        """calculates the volume of a 2D sphere (disc area) for the current radius
+        """calculates the volume of a 3D sphere for the current radius
 
         Returns:
             Disc Area (float): the disc area
