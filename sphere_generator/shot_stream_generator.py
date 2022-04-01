@@ -33,10 +33,12 @@ class shot_stream:
         
     
     def random_sphere_inside_box(self,r):
-        """Creates a sphere, random positioned INSIDE the given box using a uniform distribution. Specifically the WHOLE sphere must lies 
-       inside the box. The box may be inclined, in a specified angle. The center of the bottom surface of
-       the box is on (0,0,0), although it may be moved, according to specified offset distances. This 
-       function works for 2D and 3D spheres.
+        """Creates a sphere, randomly positioned INSIDE the given box using a 
+        uniform distribution. Specifically the WHOLE sphere must lie inside the
+        box. The box may be inclined, in a specified angle. The center of the 
+        bottom surface of the box is on (0,0,0), although it may be moved,
+        according to specified offset distances. This function works for 
+        2D and 3D spheres.
 
         Args:
             r (float): The radius of the desired sphere

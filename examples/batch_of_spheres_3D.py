@@ -30,7 +30,7 @@ def main():
     #****************FE sphere mesh is not implemented if problem is 2D****************
 
     problem_dimensions = 3# Input 2D or 3D according to your problem dimensions
-    box = generic_box( ndim=problem_dimensions,sides= (box_width,box_height,box_length) )# create the box 
+    box = Box( ndim=problem_dimensions,sides= (box_width,box_height,box_length) )# create the box 
 
     #***********************************END OF INPUT SECTION**************************************
 
