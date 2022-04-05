@@ -6,7 +6,7 @@ def main():
 
     radius = 0.5 # average radius of created sphere
 
-    # Define sphere's position in space 
+    # Define sphere's position in space
     x, y, z = 0, 0, 0
 
     # Define FE length for spheres

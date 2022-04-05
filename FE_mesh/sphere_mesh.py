@@ -365,7 +365,7 @@ def renumbering_element_pairs(old_nodes_id, sorted_nodes_id, elements_matrix):
         ndarray : Mapped elements matrix.
     """
     mapping = dict(zip(old_nodes_id, sorted_nodes_id))
-    elements_matrix = npi.remap(elements_matrix.flatten(), list(mapping.keys()), list(mapping.values())).reshape(np.shape(elements_matrix)[0], 8)
+    elements_matrix = npi.remap(elements_matrix.flatten(), list(mapping.keys()), list(mapping.values())).reshape(np.shape(elements_matrix)[0], np.shape(elements_matrix)[1])
 
     return elements_matrix
 
