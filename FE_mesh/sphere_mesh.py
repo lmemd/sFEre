@@ -243,7 +243,7 @@ def spacing(method, half_length, no_of_elements, scale_factor, transverse_no_of_
                              np.reshape(spacing_y, (np.shape(spacing_y)[0], 1)),
                              np.reshape(spacing_z, (np.shape(spacing_z)[0], 1))))
 
-    grid_all = np.zeros((1, 3))
+    grid_all = np.zeros((1, np.shape(inner)[1]))
 
     # Calling spacing method to obtain spacing values for layer elements
     j = spacing_method(spacing_method_input, transverse_no_of_elements, spacing_factor)
