@@ -11,7 +11,8 @@
     - MSc student, Laboratory of Machine Elements and Machine Design, Aristotle University of Thessaloniki
     - email: lamprou.tolis@gmail.com
     - LinkedIn: www.linkedin.com/in/aalamprou
- 
+    
+    **_Funding:_** The development of this package was funded by Research Fund Coal & Steel, Grant Agreement number 799787.
 
 ## Project description
 
@@ -19,6 +20,7 @@ This developed package, refers to engineers who simply want to simulate and mesh
 with a random or predefined position in space. It is totally suitable for _**shot peening simulation**_ or other simulation
 problems that require allocated spheres in a specific space domain. Thus, it includes tools for handling such a complex problem,
 and can be widely used from anyone.
+
 
 Main aspects, are:
 - **_Excellent mesh quality_**, using Hexaedral finite elements 
