@@ -28,7 +28,7 @@ class shot_stream:
     mean_diameter = 0 
     diameter_standard_deviation = 0
 
-    def __init__(self,number_of_spheres_setter,problem_dimensions_setter,domain_dimensions_setter,impact_angle_setter, mean_diameter_setter, diameter_standard_deviation_setter,box_offset_dists_setter=(0,0,0)):
+    def __init__(self, number_of_spheres_setter, problem_dimensions_setter, domain_dimensions_setter, impact_angle_setter,material_density_setter, mean_diameter_setter=None, diameter_standard_deviation_setter=None, box_offset_dists_setter=(0,0,0), sieve_analysis_data_setter=None):
         """Initialize attributes with given values
         """
         self.number_of_spheres = number_of_spheres_setter
@@ -36,9 +36,17 @@ class shot_stream:
         self.domain_dimensions = domain_dimensions_setter
         self.impact_angle = impact_angle_setter
         self.box_offset_dists = box_offset_dists_setter
-        self.mean_diameter = mean_diameter_setter
-        self.diameter_standard_deviation = diameter_standard_deviation_setter
         
+        if mean_diameter_setter is not None and diameter_standard_deviation_setter is not None:
+            self.mean_diameter = mean_diameter_setter
+            self.diameter_standard_deviation = diameter_standard_deviation_setter
+        elif sieve_analysis_data_setter is not None:
+            self.sieve_analysis_data = sieve_analysis_data_setter
+            self.shot_material_density = material_density_setter #in gm/mm^3
+            self.mean_diameter = None
+            self.diameter_standard_deviation = None
+        else:
+            raise ValueError("Either mean diameter and standard deviation or sieve analysis data must be provided.")
     
     def random_sphere_inside_box(self,r):
         """Creates a sphere, random positioned INSIDE the given box using a uniform distribution. Specifically the WHOLE sphere must lies 
@@ -127,7 +135,11 @@ class shot_stream:
             
             #create and allocate the sphere in space
             #####################################################
-            r = random.gauss(self.mean_diameter,self.diameter_standard_deviation)          
+            if self.sieve_analysis_data is not None:
+                pass
+            else:
+                r = random.gauss(self.mean_diameter,self.diameter_standard_deviation)
+                
             s = self.random_sphere_inside_box(r)
             ######################################################
 
