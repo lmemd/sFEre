@@ -74,11 +74,20 @@ def fit_weibull_mixture(failures):
     Returns:
     Fit_Weibull_Mixture: The results of the Weibull mixture fit.
     """
-    results = Fit_Weibull_Mixture(failures=failures)
+    results = Fit_Weibull_Mixture(failures=failures,show_probability_plot=False,print_results=False)
     return results
 
 def fit_Gaussian(failures):
-    results = Fit_Normal_2P(failures=failures)
+    """
+    Fits a Gaussian distribution to the data.
+    
+    Args:
+    failures (np.ndarray): The failure data.
+
+    Returns:
+    Fit_Normal_2P: The results of the Weibull mixture fit.
+    """
+    results = Fit_Normal_2P(failures=failures,show_probability_plot=False,print_results=False)
     return results  
 
 def generate_mixed_weibull(alpha_1, beta_1, alpha_2, beta_2, mix_proportion, size):
@@ -99,12 +108,34 @@ def generate_mixed_weibull(alpha_1, beta_1, alpha_2, beta_2, mix_proportion, siz
     weibull_1 = weibull_min(c=beta_1, scale=alpha_1)
     weibull_2 = weibull_min(c=beta_2, scale=alpha_2)
 
-    random_numbers_1 = weibull_1.rvs(size=int(size * mix_proportion))
-    random_numbers_2 = weibull_2.rvs(size=int(size * (1 - mix_proportion)))
+    size_1 = int(size * mix_proportion)
+    size_2 = size - size_1
+
+    if size_1 == 0:
+        random_numbers_1 = np.array([])
+    else:
+        random_numbers_1 = weibull_1.rvs(size=size_1)
+
+    if size_2 == 0:
+        random_numbers_2 = np.array([])
+    else:
+        random_numbers_2 = weibull_2.rvs(size=size_2)
 
     return np.concatenate([random_numbers_1, random_numbers_2])
 
+
 def generate_mixed_gaussian(mu,sigma, size):
+    """
+    Generates Gaussian distribution datadata.
+    
+    Args:
+    mu (float): The mean value of the Gaussian distribution.
+    sigma: The standard deviation of the Gaussian distribution.
+    size (int): The size of the generated data.
+
+    Returns:
+    np.ndarray: An array with the generated data
+    """
     
     data = []
     for i in range(size):
@@ -146,7 +177,7 @@ def generate_sphere_from_sieve_analysis_data(sieves,retained_weight,distribution
     bin_edges, weight_per_sieve = sort_data(sieves, retained_weight)
     bin_centers = calculate_bin_centers(bin_edges)
     number_of_shots = calculate_number_of_shots(bin_centers, weight_per_sieve,shots_material_density)
-    print(number_of_shots)
+    #print(number_of_shots)
     if distribution_fitting_method == "Gaussian" or distribution_fitting_method == "Normal":
 
         fitted_gaussian, data = calculate_Gaussian_parameters(bin_centers, weight_per_sieve)
@@ -158,11 +189,11 @@ def generate_sphere_from_sieve_analysis_data(sieves,retained_weight,distribution
     elif distribution_fitting_method == "Mixed Weibull":
         fitted_mixed_weibull, data = calculate_Weibull_parameters(bin_centers, weight_per_sieve)
         a1, b1, a2, b2, p1, = fitted_mixed_weibull.alpha_1, fitted_mixed_weibull.beta_1, fitted_mixed_weibull.alpha_2, fitted_mixed_weibull.beta_2, fitted_mixed_weibull.proportion_1
-        print(a1,b1,a2,b2,p1)
+        #print(a1,b1,a2,b2,p1)
         generated_data = generate_mixed_weibull(a1, b1, a2, b2, p1, no_of_shots)
         
         return generated_data, fitted_mixed_weibull, data
-
+'''
 def test():
     bin_values = [2., 1.6, 1.4, 1.25, 1.12, 1., 0.9, 0.8, 0.71, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.]
     frequency = [0.0, 0.1, 2.4, 46.3, 42.4, 24.8, 5.6, 5.3, 5.3, 8.8, 9.7, 7.1, 1.7, 0.2, 0.1, 0.0]
@@ -170,5 +201,6 @@ def test():
     generated_data,fitted_distribution,data = generate_sphere_from_sieve_analysis_data(bin_values,frequency,"Mixed Weibull",0.0078,no_of_shots=10000)
     
     visualize_histogram(generated_data,bin_values,data, fitted_distribution)
-
-#test()
+    print(generated_data)
+test()
+'''

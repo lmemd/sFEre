@@ -20,8 +20,6 @@ def sieve_analysis(diameters, sieve_sizes, density):
     - retained_weights: a 1D array of retained weights on each sieve in grams (float).
     - cumulative_weights: a 1D array of cumulative weights on each sieve in grams (float).
     """
-
-    
     # Sort equivalent diameters in ascending order
     sorted_diameters = np.sort(diameters)
     sieve_sizes = np.sort(sieve_sizes)

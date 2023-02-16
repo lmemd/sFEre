@@ -6,6 +6,8 @@ import random
 import math
 from matplotlib import pyplot as plt
 import numpy as np
+from sieve_analysis_tools import statistical_tools as st
+from reliability.Distributions import Weibull_Distribution, Mixture_Model, Normal_Distribution
 
 class shot_stream:
     """A class that describes the shot stream
@@ -28,7 +30,7 @@ class shot_stream:
     mean_diameter = 0 
     diameter_standard_deviation = 0
 
-    def __init__(self, number_of_spheres_setter, problem_dimensions_setter, domain_dimensions_setter, impact_angle_setter,material_density_setter, mean_diameter_setter=None, diameter_standard_deviation_setter=None, box_offset_dists_setter=(0,0,0), sieve_analysis_data_setter=None):
+    def __init__(self, number_of_spheres_setter, problem_dimensions_setter, domain_dimensions_setter, impact_angle_setter,material_density_setter, mean_diameter_setter=None, diameter_standard_deviation_setter=None, box_offset_dists_setter=(0,0,0), sieve_analysis_data_setter=None,fitting_distribution_setter = "Mixed Weibull"):
         """Initialize attributes with given values
         """
         self.number_of_spheres = number_of_spheres_setter
@@ -43,11 +45,43 @@ class shot_stream:
         elif sieve_analysis_data_setter is not None:
             self.sieve_analysis_data = sieve_analysis_data_setter
             self.shot_material_density = material_density_setter #in gm/mm^3
+            self.fitting_distribution = fitting_distribution_setter 
             self.mean_diameter = None
             self.diameter_standard_deviation = None
         else:
+
             raise ValueError("Either mean diameter and standard deviation or sieve analysis data must be provided.")
     
+    def fit_sieve_distribution(self):
+        """
+        Fits either a normal distribution or a Weibull distribution to the given sieve data.
+        
+        Args:
+        sieve_data (np.ndarray): The data obtained from sieve analysis.
+
+        Returns:
+        tuple: A tuple containing the parameters of the fitted distribution. If a normal distribution is fitted, the tuple
+            contains (mu, sigma); if a Weibull distribution is fitted, the tuple contains (alpha, beta).
+        """
+        sieve_levels = self.sieve_analysis_data[0]
+        retained_weight = self.sieve_analysis_data[1]
+        
+        bin_edges, weight_per_sieve = st.sort_data(sieve_levels, retained_weight)
+        bin_centers = st.calculate_bin_centers(bin_edges)
+        
+        # Fit a mixed Weibull distribution
+        if self.fitting_distribution == "Gaussian":
+            fitted_gaussian, data = st.calculate_Gaussian_parameters(bin_centers, weight_per_sieve)
+            mu, sigma = fitted_gaussian.mu, fitted_gaussian.sigma
+            return fitted_gaussian
+        
+        # Otherwise, fit a Gaussian distribution
+        elif self.fitting_distribution == "Mixed Weibull":       
+            fitted_mixed_weibull, data = st.calculate_Weibull_parameters(bin_centers, weight_per_sieve)
+            a1, b1, a2, b2, p1, = fitted_mixed_weibull.alpha_1, fitted_mixed_weibull.beta_1, fitted_mixed_weibull.alpha_2, fitted_mixed_weibull.beta_2, fitted_mixed_weibull.proportion_1
+            return fitted_mixed_weibull
+
+
     def random_sphere_inside_box(self,r):
         """Creates a sphere, random positioned INSIDE the given box using a uniform distribution. Specifically the WHOLE sphere must lies 
        inside the box. The box may be inclined, in a specified angle. The center of the bottom surface of
@@ -136,7 +170,10 @@ class shot_stream:
             #create and allocate the sphere in space
             #####################################################
             if self.sieve_analysis_data is not None:
-                pass
+                distr = self.fit_sieve_distribution()
+                print(type(distr.distribution))
+                if isinstance(distr.distribution, Mixture_Model):
+                    print('found')
             else:
                 r = random.gauss(self.mean_diameter,self.diameter_standard_deviation)
                 
