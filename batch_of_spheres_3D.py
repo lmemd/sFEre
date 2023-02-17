@@ -52,8 +52,8 @@ def main():
         spheres_list.extend(spheres)
 
         # 3D plot of generated spheres        
-        stream.plot_spheres(spheres_list)
-        stream.plot_coverage(spheres_list)
+        #stream.plot_spheres(spheres_list)
+        #stream.plot_coverage(spheres_list)
 
     # Print the X,Y coordinates and the radii of created spheres
     list_to_print = ['%.4f'%s.x + '    ' +  '%.4f'%s.y + '   ' +  '%.4f'%s.z + '    ' +  '%.4f'%s.r for s in spheres]
