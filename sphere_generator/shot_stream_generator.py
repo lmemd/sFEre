@@ -27,10 +27,10 @@ class shot_stream:
     domain_dimensions = None
     impact_angle = 0
     box_offset_dists = (0,0,0)
-    mean_diameter = 0 
+    mean_radius = 0 
     diameter_standard_deviation = 0
 
-    def __init__(self, number_of_spheres_setter, problem_dimensions_setter, domain_dimensions_setter, impact_angle_setter,material_density_setter, mean_diameter_setter=None, diameter_standard_deviation_setter=None, box_offset_dists_setter=(0,0,0), sieve_analysis_data_setter=None,fitting_distribution_setter = "Mixed Weibull"):
+    def __init__(self, number_of_spheres_setter, problem_dimensions_setter, domain_dimensions_setter, impact_angle_setter,material_density_setter, mean_radius_setter=None, diameter_standard_deviation_setter=None, box_offset_dists_setter=(0,0,0), sieve_analysis_data_setter=None,fitting_distribution_setter = "Mixed Weibull"):
         """Initialize attributes with given values
         """
         self.number_of_spheres = number_of_spheres_setter
@@ -39,14 +39,15 @@ class shot_stream:
         self.impact_angle = impact_angle_setter
         self.box_offset_dists = box_offset_dists_setter
         
-        if mean_diameter_setter is not None and diameter_standard_deviation_setter is not None:
-            self.mean_diameter = mean_diameter_setter
+        if mean_radius_setter is not None and diameter_standard_deviation_setter is not None:
+            self.mean_radius = mean_radius_setter
             self.diameter_standard_deviation = diameter_standard_deviation_setter
+            self.sieve_analysis_data = None
         elif sieve_analysis_data_setter is not None:
             self.sieve_analysis_data = sieve_analysis_data_setter
             self.shot_material_density = material_density_setter #in gm/mm^3
             self.fitting_distribution = fitting_distribution_setter 
-            self.mean_diameter = None
+            self.mean_radius = None
             self.diameter_standard_deviation = None
         else:
 
@@ -162,6 +163,12 @@ class shot_stream:
         """
         no_sphere_loops = 0 #total number of loops for each distribution. If they exceed a limit, the loop stops
         spheres = []
+
+        #Check if sieve analysis data exist
+        if self.sieve_analysis_data is not None:
+            distribution = self.fit_sieve_distribution()
+            print(type(distribution.distribution))
+            flag = "Custom distribution"
         
         #Loop for each shot
         #####################################################
@@ -169,18 +176,17 @@ class shot_stream:
             
             #create and allocate the sphere in space
             #####################################################
-            if self.sieve_analysis_data is not None:
-                distribution = self.fit_sieve_distribution()
-                print(type(distribution.distribution))
+            
+            if flag == "Custom distribution":
                 if isinstance(distribution.distribution, Mixture_Model):
                     a1, b1, a2, b2, p1, = distribution.alpha_1, distribution.beta_1, distribution.alpha_2, distribution.beta_2, distribution.proportion_1
-                    r = st.generate_mixed_weibull(a1, b1, a2, b2, p1, size=1)[0]
+                    r = st.generate_mixed_weibull(a1, b1, a2, b2, p1, size=1)[0]/2 #generator from sieve data results diameter and not radius          
                     print(r)
                 else:
-                    pass
+                    mu, sigma = distribution.mu, distribution.sigma
+                    r = st.generate_gaussian(mu, sigma, size=1)[0]/2
             else:
-                r = random.gauss(self.mean_diameter,self.diameter_standard_deviation)
-                
+                r = random.gauss(self.mean_radius,self.diameter_standard_deviation)
             s = self.random_sphere_inside_box(r)
             ######################################################
 
@@ -188,7 +194,6 @@ class shot_stream:
             if not s.r < 0.1 and not s.r > 2 and not s.y < s.r + 0.01 and not self.intersects_existing(s,spheres):
                 spheres.append(s) #add the created sphere to the list
                 no_sphere_loops = 0 #zero-out the sphere loops iterator
-
         return spheres
 
     def intersects_existing(self,sph,spheres):
