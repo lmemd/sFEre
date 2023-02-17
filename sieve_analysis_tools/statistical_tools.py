@@ -124,7 +124,7 @@ def generate_mixed_weibull(alpha_1, beta_1, alpha_2, beta_2, mix_proportion, siz
     return np.concatenate([random_numbers_1, random_numbers_2])
 
 
-def generate_mixed_gaussian(mu,sigma, size):
+def generate_gaussian(mu,sigma, size):
     """
     Generates Gaussian distribution datadata.
     
@@ -182,7 +182,7 @@ def generate_sphere_from_sieve_analysis_data(sieves,retained_weight,distribution
 
         fitted_gaussian, data = calculate_Gaussian_parameters(bin_centers, weight_per_sieve)
         mu, sigma = fitted_gaussian.mu, fitted_gaussian.sigma
-        generated_data = generate_mixed_gaussian(mu,sigma,no_of_shots)
+        generated_data = generate_gaussian(mu,sigma,no_of_shots)
 
         return generated_data, fitted_gaussian, data
 

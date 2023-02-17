@@ -49,11 +49,7 @@ class sphere_3D(generic_sphere):
     def volume(self):
         """calculates the volume of a 2D sphere (disc area) for the current radius
 
-sphere = sphere_2D((1,2),3 )
-print(sphere.ndim)
-print(sphere.r)
-print(sphere.x)
-print(sphere.volume())
-
-sphere_2 = sphere_3D()
-print(sphere_2.volume())
+        Returns:
+            Disc Area (float): the disc area
+        """
+        return (4/3)*math.pi*(self.r**3)
