@@ -170,10 +170,14 @@ class shot_stream:
             #create and allocate the sphere in space
             #####################################################
             if self.sieve_analysis_data is not None:
-                distr = self.fit_sieve_distribution()
-                print(type(distr.distribution))
-                if isinstance(distr.distribution, Mixture_Model):
-                    print('found')
+                distribution = self.fit_sieve_distribution()
+                print(type(distribution.distribution))
+                if isinstance(distribution.distribution, Mixture_Model):
+                    a1, b1, a2, b2, p1, = distribution.alpha_1, distribution.beta_1, distribution.alpha_2, distribution.beta_2, distribution.proportion_1
+                    r = st.generate_mixed_weibull(a1, b1, a2, b2, p1, size=1)[0]
+                    print(r)
+                else:
+                    pass
             else:
                 r = random.gauss(self.mean_diameter,self.diameter_standard_deviation)
                 

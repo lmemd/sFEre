@@ -198,9 +198,14 @@ def test():
     bin_values = [2., 1.6, 1.4, 1.25, 1.12, 1., 0.9, 0.8, 0.71, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.]
     frequency = [0.0, 0.1, 2.4, 46.3, 42.4, 24.8, 5.6, 5.3, 5.3, 8.8, 9.7, 7.1, 1.7, 0.2, 0.1, 0.0]
     bin_values, frequency = sort_data(bin_values,frequency)
-    generated_data,fitted_distribution,data = generate_sphere_from_sieve_analysis_data(bin_values,frequency,"Mixed Weibull",0.0078,no_of_shots=10000)
     
-    visualize_histogram(generated_data,bin_values,data, fitted_distribution)
+    generated = []
+    for i in range(1):
+        generated_data,fitted_distribution,data = generate_sphere_from_sieve_analysis_data(bin_values,frequency,"Mixed Weibull",0.0078,no_of_shots=1)
+        generated.extend(generated_data)
+        print(generated)
+
+    visualize_histogram(generated,bin_values,data, fitted_distribution)
     print(generated_data)
 test()
 '''
