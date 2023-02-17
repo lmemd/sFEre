@@ -55,6 +55,7 @@ class sphere_3D(generic_sphere):
 
 #debugging code
 
+'''
 sphere = sphere_2D((1,2),3 )
 print(sphere.ndim)
 print(sphere.r)
@@ -63,3 +64,4 @@ print(sphere.volume())
 
 sphere_2 = sphere_3D()
 print(sphere_2.volume())
+'''
