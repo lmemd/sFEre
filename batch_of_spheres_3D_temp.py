@@ -23,7 +23,7 @@ def main():
     # Define the domain characteristics (the space that contains the created spheres)
     box_width = 2 # width of the domain containing the spheres (alongside X axis)
     box_length = 2 # length of the domain containing the spheres (alongside Z axis)
-    box_height = 5 # height of the domain containing the spheres (alongside Y axis)
+    box_height = 20 # height of the domain containing the spheres (alongside Y axis)
     box_angle = 90 # change this value if you want an inlcined box (defined by the angle between the box and the XZ plane)
 
     # Define if your problem is in 2 dimensional or 3 dimensional space (2D or 3D)
