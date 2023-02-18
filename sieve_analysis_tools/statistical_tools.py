@@ -172,6 +172,9 @@ def calculate_Gaussian_parameters(bin_values, frequency):
     
     return results, all_data
 
+#Debuggin code
+
+'''
 def generate_sphere_from_sieve_analysis_data(sieves,retained_weight,distribution_fitting_method,shots_material_density,no_of_shots=1):
     
     bin_edges, weight_per_sieve = sort_data(sieves, retained_weight)
@@ -193,7 +196,7 @@ def generate_sphere_from_sieve_analysis_data(sieves,retained_weight,distribution
         generated_data = generate_mixed_weibull(a1, b1, a2, b2, p1, no_of_shots)
         
         return generated_data, fitted_mixed_weibull, data
-'''
+
 def test():
     bin_values = [2., 1.6, 1.4, 1.25, 1.12, 1., 0.9, 0.8, 0.71, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.]
     frequency = [0.0, 0.1, 2.4, 46.3, 42.4, 24.8, 5.6, 5.3, 5.3, 8.8, 9.7, 7.1, 1.7, 0.2, 0.1, 0.0]
