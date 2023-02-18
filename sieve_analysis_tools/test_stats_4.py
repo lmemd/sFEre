@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import math
 from scipy.stats import weibull_min
 import random
+import statistical_tools as st
 
 def sieve_analysis(diameters, sieve_sizes, density):
     """
@@ -73,3 +74,28 @@ def plot_sieve_analysis(sieve_sizes, retained_weights, cumulative_weights):
     plt.title('Virtual Sieve Analysis')
     plt.show()
 
+def test():
+    bin_values = [2., 1.6, 1.4, 1.25, 1.12, 1., 0.9, 0.8, 0.71, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.]
+    frequency = [0.0, 0.1, 2.4, 46.3, 42.4, 24.8, 5.6, 5.3, 5.3, 8.8, 9.7, 7.1, 1.7, 0.2, 0.1, 0.0]
+    bin_values, frequency = st.sort_data(bin_values,frequency)
+    
+
+
+    generated,fitted_distribution,data = st.generate_sphere_from_sieve_analysis_data(bin_values,frequency,"Mixed Weibull",0.0078,no_of_shots=100000)
+    
+
+
+    st.visualize_histogram(generated,bin_values,data, fitted_distribution)
+    
+    
+    perform_sieve_analysis = sieve_analysis(generated, bin_values, 0.0078)
+    normalized_generated_retained_weight = st.normalize_frequency(perform_sieve_analysis[0])
+    normalized_measured_retained_weight = st.normalize_frequency(frequency)
+
+    plt.plot(bin_values,normalized_generated_retained_weight)
+    plt.plot(bin_values,normalized_measured_retained_weight)
+    #print(normalized_retained_weight)
+    plt.show()
+    
+    #print(perform_sieve_analysis[0],perform_sieve_analysis[0])
+test()

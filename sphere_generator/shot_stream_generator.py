@@ -198,7 +198,6 @@ class shot_stream:
                 if isinstance(distribution.distribution, Mixture_Model):
                     a1, b1, a2, b2, p1, = distribution.alpha_1, distribution.beta_1, distribution.alpha_2, distribution.beta_2, distribution.proportion_1
                     r = st.generate_mixed_weibull(a1, b1, a2, b2, p1, size=1)[0]/2 #generator from sieve data results diameter and not radius          
-                    print(r)
                 else:
                     mu, sigma = distribution.mu, distribution.sigma
                     r = st.generate_gaussian(mu, sigma, size=1)[0]/2
