@@ -18,8 +18,11 @@ class shot_stream:
        domain_dimensions (box) : The box dimensions (width,height,length) in which the stream exists
        impact angle (float) : The angle of the stream in degrees.
        box_offset_dists (tupple) : The distances for the stream to be offseted in space
-       mean_diameter (float) : The average diameter of the shots
-       diameter_standard_deviation (float) : The standard deviation of the diameter
+       mean_radius (float) : The average radius of the shots
+       radius_standard_deviation (float) : The standard deviation of the diameter
+       sieve_analysis_data (list(list,list)) : A list that contains two lists with the sieve diameters and the retained weight respectively
+       fitting_distribution (string): The distribution to fit to sieve analysis data. Only when sieve analysis data exists. Only works for "Gaussian" or "Mixed Weibull"
+       material _density (float): The density of the material of the shots given in gm/mm^3. Necessary to perform the sieve analysis and fit the distribution
     """
     
     number_of_spheres = 1
@@ -28,9 +31,21 @@ class shot_stream:
     impact_angle = 0
     box_offset_dists = (0,0,0)
     mean_radius = 0 
-    diameter_standard_deviation = 0
+    radius_standard_deviation = 0
 
-    def __init__(self, number_of_spheres_setter, problem_dimensions_setter, domain_dimensions_setter, impact_angle_setter,material_density_setter, mean_radius_setter=None, diameter_standard_deviation_setter=None, box_offset_dists_setter=(0,0,0), sieve_analysis_data_setter=None,fitting_distribution_setter = "Mixed Weibull"):
+    def __init__(self, 
+                number_of_spheres_setter, 
+                problem_dimensions_setter, 
+                domain_dimensions_setter,
+                impact_angle_setter,
+                box_offset_dists_setter=(0,0,0),     
+                mean_radius_setter=None,
+                radius_standard_deviation_setter=None, 
+                sieve_analysis_data_setter=None,
+                fitting_distribution_setter = "Mixed Weibull",
+                material_density_setter = 0):
+
+
         """Initialize attributes with given values
         """
         self.number_of_spheres = number_of_spheres_setter
@@ -39,16 +54,18 @@ class shot_stream:
         self.impact_angle = impact_angle_setter
         self.box_offset_dists = box_offset_dists_setter
         
-        if mean_radius_setter is not None and diameter_standard_deviation_setter is not None:
+        if mean_radius_setter is not None and radius_standard_deviation_setter is not None:
             self.mean_radius = mean_radius_setter
-            self.diameter_standard_deviation = diameter_standard_deviation_setter
+            self.radius_standard_deviation = radius_standard_deviation_setter
             self.sieve_analysis_data = None
+            self.shot_material_density = None
+
         elif sieve_analysis_data_setter is not None:
             self.sieve_analysis_data = sieve_analysis_data_setter
             self.shot_material_density = material_density_setter #in gm/mm^3
             self.fitting_distribution = fitting_distribution_setter 
             self.mean_radius = None
-            self.diameter_standard_deviation = None
+            self.radius_standard_deviation = None
         else:
 
             raise ValueError("Either mean diameter and standard deviation or sieve analysis data must be provided.")
@@ -186,7 +203,7 @@ class shot_stream:
                     mu, sigma = distribution.mu, distribution.sigma
                     r = st.generate_gaussian(mu, sigma, size=1)[0]/2
             else:
-                r = random.gauss(self.mean_radius,self.diameter_standard_deviation)
+                r = random.gauss(self.mean_radius,self.radius_standard_deviation)
             s = self.random_sphere_inside_box(r)
             ######################################################
 

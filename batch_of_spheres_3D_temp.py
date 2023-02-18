@@ -40,7 +40,13 @@ def main():
     for set_number in range(spheres_batches):
 
         # Generate stream of random distributed shots in space
-        stream = shot_stream(spheres_number, problem_dimensions, box, box_angle, 0.0078 ,sieve_analysis_data_setter=sieve_analysis_data, fitting_distribution_setter="Mixed Weibull")
+        stream = shot_stream(spheres_number, 
+                            problem_dimensions, 
+                            box, 
+                            box_angle, 
+                            sieve_analysis_data_setter=sieve_analysis_data,                             
+                            fitting_distribution_setter="Mixed Weibull",
+                            material_density_setter=0.0078)
         spheres = stream.generate() # Create the stream
         
         # Change the filename according to current index of set number
