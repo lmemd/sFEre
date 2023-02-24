@@ -44,13 +44,14 @@ def calculate_number_of_shots(bin_centers,mass,density_of_shots):
     
     Args:
     bin_centers (np.ndarray): The centers of the bins.
+    mass (np.array): The retained weight per sieve
     density_of_shots (float): The density of shots.
 
     Returns:
     np.ndarray: An array of number of shots for each bin center.
     """
     average_mass_per_shot = (4/3)*math.pi*((bin_centers/2)**3)*density_of_shots
-    return np.around(mass[1:]/average_mass_per_shot,decimals=0)
+    return np.around(mass[:-1]/average_mass_per_shot,decimals=0)
 
 def normalize_frequency(frequency):
     """
@@ -144,7 +145,9 @@ def generate_gaussian(mu,sigma, size):
     return np.array(data)
 
 def visualize_histogram(generated_data,bin_edges,data, results):
-    
+    '''
+    needs corrected sorting for visualization
+    '''
     plt.figure(figsize=(9, 5))
     plt.subplot(121)
     histogram(data,bins = bin_edges)
@@ -180,17 +183,18 @@ def generate_sphere_from_sieve_analysis_data(sieves,retained_weight,distribution
     bin_edges, weight_per_sieve = sort_data(sieves, retained_weight)
     bin_centers = calculate_bin_centers(bin_edges)
     number_of_shots = calculate_number_of_shots(bin_centers, weight_per_sieve,shots_material_density)
+    print(number_of_shots)
     #print(number_of_shots)
     if distribution_fitting_method == "Gaussian" or distribution_fitting_method == "Normal":
 
-        fitted_gaussian, data = calculate_Gaussian_parameters(bin_centers, weight_per_sieve)
+        fitted_gaussian, data = calculate_Gaussian_parameters(bin_edges[:-1],number_of_shots)
         mu, sigma = fitted_gaussian.mu, fitted_gaussian.sigma
         generated_data = generate_gaussian(mu,sigma,no_of_shots)
 
         return generated_data, fitted_gaussian, data
 
     elif distribution_fitting_method == "Mixed Weibull":
-        fitted_mixed_weibull, data = calculate_Weibull_parameters(bin_centers, weight_per_sieve)
+        fitted_mixed_weibull, data = calculate_Weibull_parameters(bin_edges[:-1],number_of_shots)
         a1, b1, a2, b2, p1, = fitted_mixed_weibull.alpha_1, fitted_mixed_weibull.beta_1, fitted_mixed_weibull.alpha_2, fitted_mixed_weibull.beta_2, fitted_mixed_weibull.proportion_1
         #print(a1,b1,a2,b2,p1)
         generated_data = generate_mixed_weibull(a1, b1, a2, b2, p1, no_of_shots)
@@ -203,12 +207,12 @@ def test():
     bin_values, frequency = sort_data(bin_values,frequency)
     
     generated = []
-    for i in range(1):
+    for i in range(100):
         generated_data,fitted_distribution,data = generate_sphere_from_sieve_analysis_data(bin_values,frequency,"Mixed Weibull",0.0078,no_of_shots=1)
         generated.extend(generated_data)
-        print(generated)
+        #print(generated)
 
     visualize_histogram(generated,bin_values,data, fitted_distribution)
-    print(generated_data)
+    #print(generated_data)
 test()
 '''
