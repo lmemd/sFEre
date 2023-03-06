@@ -24,7 +24,6 @@ class shot_stream:
        fitting_distribution (string): The distribution to fit to sieve analysis data. Only when sieve analysis data exists. Only works for "Gaussian" or "Mixed Weibull"
        material _density (float): The density of the material of the shots given in gm/mm^3. Necessary to perform the sieve analysis and fit the distribution
     """
-<<<<<<< Updated upstream
     
     number_of_spheres = 1
     problem_dimensions = 0
@@ -54,19 +53,6 @@ class shot_stream:
         self.domain_dimensions = domain_dimensions_setter
         self.impact_angle = impact_angle_setter
         self.box_offset_dists = box_offset_dists_setter
-=======
- 
-    def __init__(self,number_of_spheres = 1, problem_dimensions = 0, domain_dimensions = None, impact_angle = 0, mean_diameter = 0, diameter_standard_deviation = 0,box_offset_dists=(0,0,0)):
-        """Initialize attributes with given values
-        """
-        self.number_of_spheres = number_of_spheres
-        self.problem_dimensions = problem_dimensions
-        self.domain_dimensions = domain_dimensions
-        self.impact_angle = impact_angle
-        self.box_offset_dists = box_offset_dists
-        self.mean_diameter = mean_diameter
-        self.diameter_standard_deviation = diameter_standard_deviation
->>>>>>> Stashed changes
         
         if mean_radius_setter is not None and radius_standard_deviation_setter is not None:
             self.mean_radius = mean_radius_setter
