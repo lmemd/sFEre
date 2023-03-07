@@ -61,7 +61,7 @@ def mesh_interface(mesh_method, spacing_method, spheres, element_length, filenam
         if output_option == "general":
             output_general_file(nodes_all, elements_all, filename)
         elif output_option == "LSDYNA":
-            output_keyword_file(nodes_all, elements_all, pid, filename, output_path)
+            output_keyword_file(nodes_all, elements_all, pid, filename)
         else:
             print("Nothing was outputed.")
 
