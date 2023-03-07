@@ -8,6 +8,8 @@ from matplotlib import pyplot as plt
 import numpy as np
 from sieve_analysis_tools import statistical_tools as st
 from reliability.Distributions import Weibull_Distribution, Mixture_Model, Normal_Distribution
+import sieve_analysis_tools.distributions as dist
+import sieve_analysis_tools.statistical_tools as st
 
 class shot_stream:
     """A class that describes the shot stream
@@ -85,20 +87,23 @@ class shot_stream:
         retained_weight = self.sieve_analysis_data[1]
         
         bin_edges, weight_per_sieve = st.sort_data(sieve_levels, retained_weight)
-        bin_centers = st.calculate_bin_centers(bin_edges)
-        
+        bin_centers = st.calculate_bin_centers(bin_edges)  
+
+        number_of_shots = st.calculate_number_of_shots(bin_centers, weight_per_sieve,self.shot_material_density)
+    
         # Fit a mixed Weibull distribution
         if self.fitting_distribution == "Gaussian":
-            fitted_gaussian, data = st.calculate_Gaussian_parameters(bin_centers, weight_per_sieve)
-            mu, sigma = fitted_gaussian.mu, fitted_gaussian.sigma
-            return fitted_gaussian
+            
+            fitted_gaussian, data = st.calculate_Gaussian_parameters(bin_edges[:-1], number_of_shots)            
+            fitted_distribution = dist.GaussianDistribution(fitted_gaussian.mu, fitted_gaussian.sigma)
         
         # Otherwise, fit a Gaussian distribution
         elif self.fitting_distribution == "Mixed Weibull":       
-            fitted_mixed_weibull, data = st.calculate_Weibull_parameters(bin_centers, weight_per_sieve)
-            a1, b1, a2, b2, p1, = fitted_mixed_weibull.alpha_1, fitted_mixed_weibull.beta_1, fitted_mixed_weibull.alpha_2, fitted_mixed_weibull.beta_2, fitted_mixed_weibull.proportion_1
-            return fitted_mixed_weibull
+            
+            fitted_mixed_weibull, data = st.calculate_Weibull_parameters(bin_edges[:-1], number_of_shots)            
+            fitted_distribution = dist.MixedWeibull(fitted_mixed_weibull.alpha_1, fitted_mixed_weibull.beta_1, fitted_mixed_weibull.alpha_2, fitted_mixed_weibull.beta_2, fitted_mixed_weibull.proportion_1)
 
+        return fitted_distribution
 
     def random_sphere_inside_box(self,r):
         """Creates a sphere, random positioned INSIDE the given box using a uniform distribution. Specifically the WHOLE sphere must lies 
@@ -180,12 +185,12 @@ class shot_stream:
         """
         no_sphere_loops = 0 #total number of loops for each distribution. If they exceed a limit, the loop stops
         spheres = []
+        custom_distribution_flag = False
 
         #Check if sieve analysis data exist
         if self.sieve_analysis_data is not None:
             distribution = self.fit_sieve_distribution()
-            print(type(distribution.distribution))
-            flag = "Custom distribution"
+            custom_distribution_flag = True
         
         #Loop for each shot
         #####################################################
@@ -194,20 +199,15 @@ class shot_stream:
             #create and allocate the sphere in space
             #####################################################
             
-            if flag == "Custom distribution":
-                if isinstance(distribution.distribution, Mixture_Model):
-                    a1, b1, a2, b2, p1, = distribution.alpha_1, distribution.beta_1, distribution.alpha_2, distribution.beta_2, distribution.proportion_1
-                    r = st.generate_mixed_weibull(a1, b1, a2, b2, p1, size=1)[0]/2 #generator from sieve data results diameter and not radius          
-                else:
-                    mu, sigma = distribution.mu, distribution.sigma
-                    r = st.generate_gaussian(mu, sigma, size=1)[0]/2
+            if custom_distribution_flag:
+                r = distribution.generate_random_numbers(1)[0]/2
             else:
                 r = random.gauss(self.mean_radius,self.radius_standard_deviation)
             s = self.random_sphere_inside_box(r)
             ######################################################
 
             #check if size criteria are satisfied
-            if not s.r < 0.1 and not s.r > 2 and not s.y < s.r + 0.01 and not self.intersects_existing(s,spheres):
+            if not s.y < s.r + 0.01 and not self.intersects_existing(s,spheres):
                 spheres.append(s) #add the created sphere to the list
                 no_sphere_loops = 0 #zero-out the sphere loops iterator
         return spheres
@@ -263,64 +263,53 @@ class shot_stream:
     
     def plot_spheres(self,spheres):
         """Plots the generated spheres, in space or in plane.
-           WARNING: Definitely needs optimization
 
         Args:
             spheres (list): The spheres list of the shot stream
         """
         
         box = self.domain_dimensions
-        points = np.empty((0,3), int)
-        radii  = np.empty((0,1), int)
-
+        
+        x_centers = np.empty((0,), dtype=float)
+        y_centers = np.empty((0,), dtype=float)
+        z_centers = np.empty((0,), dtype=float)
+        radii = np.empty((0,), dtype=float)
+        
         for sph in spheres:
             
-            points = np.append(points, np.array([[sph.x,sph.y,sph.z]]), axis=0)
-            radii = np.append(radii, np.array([[sph.r]]), axis=0)
+            x_centers = np.append(x_centers, sph.x)
+            y_centers = np.append(y_centers, sph.y)
+            z_centers = np.append(z_centers, sph.z)
+            radii = np.append(radii, sph.r)
 
         if box.dim_z != 0:
 
-            def disks2(disk, radius):
-                """Creates the 2D disk in parametric form, to be used in 3D sphere plotting.
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
 
-                Args:
-                    disk (list): The list with x,y,z coordinates
-                    radius (float): The radius of the sphere
+            # Plot each sphere
+            for x_center, y_center, z_center, radius in zip(x_centers, y_centers, z_centers, radii):
+                u, v = np.mgrid[0:2*np.pi:20j, 0:np.pi:10j]
+                x = x_center + radius*np.cos(u)*np.sin(v)
+                y = y_center + radius*np.sin(u)*np.sin(v)
+                z = z_center + radius*np.cos(v)
+                ax.plot_wireframe(x, y, z, color='b')
 
-                Returns:
-                    float: the x,y,z coordinates of the sphere in space
-                """
-                u = np.linspace(0, 2 * np.pi, 100)
-                v = np.linspace(0, np.pi, 100)
-                x = radius * np.outer(np.cos(u), np.sin(v))
-                y = radius * np.outer(np.sin(u), np.sin(v))
-                z = radius * np.outer(np.ones(np.size(u)), np.cos(v))
-                
-                return x+disk[0],y+disk[1],z+disk[2]
-
-            def plotting_spheres(data,box_dimensions):
-                """Main plotter of the 3D sphere
-
-                Args:
-                    data (list): The list with the x,z,y and u,v parameters
-                    box_dimensions (tuple): The dimensions of the 3D space
-                """
-                fig = plt.figure(figsize=(12,12), dpi=300)
-                ax = fig.add_subplot(111, projection='3d')
-                for k,sph in enumerate(data):
-                    x, y, z = sph[0], sph[1], sph[2]
-                    ax.plot_surface(x, y, z,  rstride=4, cstride=4, 
-                                    color = 'blue', linewidth=0, alpha=0.5)
-
-                ax.set_box_aspect(aspect = box_dimensions)
-                plt.show()
+            # Set the limits of each axis to be equal and set the aspect ratio
+            ax.set_xlim(-box.dim_x/2, box.dim_x/2)
+            ax.set_ylim(0, box.dim_y)
+            ax.set_zlim(-box.dim_z/2, box.dim_z/2)
+            ax.set_box_aspect((1,1,1))  # set the aspect ratio to be equal
             
-            data = [disks2(points[k,:], radii[k]) for k in range(self.number_of_spheres)]
-            plotting_spheres(data,(box.dim_x,box.dim_y,box.dim_z))
+            # Set axis labels and display plot
+            ax.set_xlabel('X')
+            ax.set_ylabel('Y')
+            ax.set_zlabel('Z')
+            plt.show()
 
         elif box.dim_z == 0:
-            for coord,radius in zip(points,radii):
-                circle = plt.Circle((coord[0], coord[1]), radius , edgecolor = 'black', facecolor = 'red', alpha = 0.3)
+            for x_center, y_center, radius in zip(x_centers, y_centers,radii):
+                circle = plt.Circle((x_center, y_center), radius , edgecolor = 'black', facecolor = 'red', alpha = 0.3)
             
                 plt.gca().set_xlim((-box.dim_x/2, box.dim_x/2))
                 plt.gca().set_ylim((0, box.dim_y))

@@ -1,11 +1,10 @@
 from reliability.Fitters import Fit_Weibull_Mixture, Fit_Everything, Fit_Normal_2P
-from reliability.Distributions import Weibull_Distribution, Mixture_Model
 from reliability.Other_functions import histogram
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-from scipy.stats import weibull_min
-import random
+
+#import distributions as dist
 
 def sort_data(bin_values, frequency):
     """
@@ -25,6 +24,23 @@ def sort_data(bin_values, frequency):
     bin_values = np.array(bin_values)[sorting_indices]
     frequency = np.array(frequency)[sorting_indices]
     return bin_values, frequency
+
+def calculate_cumulative_frequencies(frequencies):
+    """Calculate the cumulative frequencies for a sample.
+
+    Args:
+        frequencies (list or numpy.ndarray): A list or numpy array of frequencies for a sample.
+
+    Returns:
+        numpy.ndarray: A numpy array of cumulative frequencies.
+    """
+    # Convert input to numpy array for easier manipulation
+    frequencies = np.array(frequencies)
+
+    # Calculate cumulative sum of frequencies
+    cumulative_frequencies = np.cumsum(frequencies)
+
+    return cumulative_frequencies
 
 def calculate_bin_centers(bin_edges):
     """
@@ -91,63 +107,19 @@ def fit_Gaussian(failures):
     results = Fit_Normal_2P(failures=failures,show_probability_plot=False,print_results=False)
     return results  
 
-def generate_mixed_weibull(alpha_1, beta_1, alpha_2, beta_2, mix_proportion, size):
-    """
-    Generates mixed Weibull data.
-    
-    Args:
-    alpha_1 (float): The shape parameter of the first Weibull distribution.
-    beta_1 (float): The scale parameter of the first Weibull distribution.
-    alpha_2 (float): The shape parameter of the second Weibull distribution.
-    beta_2 (float): The scale parameter of the second Weibull distribution.
-    mix_proportion (float): The mixing proportion of the two Weibull distributions.
-    size (int): The size of the generated data.
-
-    Returns:
-    np.ndarray: An array with the generated data
-    """
-    weibull_1 = weibull_min(c=beta_1, scale=alpha_1)
-    weibull_2 = weibull_min(c=beta_2, scale=alpha_2)
-
-    size_1 = int(size * mix_proportion)
-    size_2 = size - size_1
-
-    if size_1 == 0:
-        random_numbers_1 = np.array([])
-    else:
-        random_numbers_1 = weibull_1.rvs(size=size_1)
-
-    if size_2 == 0:
-        random_numbers_2 = np.array([])
-    else:
-        random_numbers_2 = weibull_2.rvs(size=size_2)
-
-    return np.concatenate([random_numbers_1, random_numbers_2])
-
-
-def generate_gaussian(mu,sigma, size):
-    """
-    Generates Gaussian distribution datadata.
-    
-    Args:
-    mu (float): The mean value of the Gaussian distribution.
-    sigma: The standard deviation of the Gaussian distribution.
-    size (int): The size of the generated data.
-
-    Returns:
-    np.ndarray: An array with the generated data
-    """
-    
-    data = []
-    for i in range(size):
-        data.append(random.gauss(mu,sigma))
-    
-    return np.array(data)
 
 def visualize_histogram(generated_data,bin_edges,data, results):
-    '''
-    needs corrected sorting for visualization
-    '''
+    """Visualize a histogram with generated data, bin edges, data, and results.
+
+    Args:
+        generated_data (numpy.ndarray): An array of generated data to plot.
+        bin_edges (numpy.ndarray): An array of bin edges for the histogram.
+        data (numpy.ndarray): An array of data to plot on the histogram.
+        results (object): An object with distribution data to plot.
+
+    Returns:
+        None
+    """
     plt.figure(figsize=(9, 5))
     plt.subplot(121)
     histogram(data,bins = bin_edges)
@@ -160,6 +132,16 @@ def visualize_histogram(generated_data,bin_edges,data, results):
     plt.show()
 
 def calculate_Weibull_parameters(bin_values, frequency):
+    """Calculate Weibull parameters for given bin values and frequency.
+
+    Args:
+        bin_values (numpy.ndarray): An array of bin values.
+        frequency (numpy.ndarray): An array of frequencies.
+
+    Returns:
+        tuple: A tuple with two elements. The first element is an object with Weibull distribution parameters.
+            The second element is an array of all the data used for fitting the distribution.
+    """
     bin_values_sorted, frequency_sorted = sort_data(bin_values, frequency)
     frequency = normalize_frequency(frequency_sorted)
     all_data = np.array([bin_values_sorted[i] for i in range(len(bin_values_sorted)) for j in range(int(frequency_sorted[i]))])
@@ -168,6 +150,16 @@ def calculate_Weibull_parameters(bin_values, frequency):
     return results, all_data
 
 def calculate_Gaussian_parameters(bin_values, frequency):
+    """Calculate Gaussian parameters for given bin values and frequency.
+
+    Args:
+        bin_values (numpy.ndarray): An array of bin values.
+        frequency (numpy.ndarray): An array of frequencies.
+
+    Returns:
+        tuple: A tuple with two elements. The first element is an object with Gaussian distribution parameters.
+            The second element is an array of all the data used for fitting the distribution.
+    """
     bin_values, frequency = sort_data(bin_values, frequency)
     frequency = normalize_frequency(frequency)
     all_data = np.array([bin_values[i] for i in range(len(bin_values)) for j in range(int(frequency[i]))])
@@ -176,43 +168,27 @@ def calculate_Gaussian_parameters(bin_values, frequency):
     return results, all_data
 
 #Debuggin code
-
-
+'''
 def generate_sphere_from_sieve_analysis_data(sieves,retained_weight,distribution_fitting_method,shots_material_density,no_of_shots=1):
     
     bin_edges, weight_per_sieve = sort_data(sieves, retained_weight)
     bin_centers = calculate_bin_centers(bin_edges)
     number_of_shots = calculate_number_of_shots(bin_centers, weight_per_sieve,shots_material_density)
     print(number_of_shots)
-    #print(number_of_shots)
+
     if distribution_fitting_method == "Gaussian" or distribution_fitting_method == "Normal":
 
         fitted_gaussian, data = calculate_Gaussian_parameters(bin_edges[:-1],number_of_shots)
-        mu, sigma = fitted_gaussian.mu, fitted_gaussian.sigma
-        generated_data = generate_gaussian(mu,sigma,no_of_shots)
+        fitted_distribution = dist.GaussianDistribution(fitted_gaussian.mu, fitted_gaussian.sigma)
+        generated_data =fitted_distribution.generate_random_numbers(no_of_shots)
 
         return generated_data, fitted_gaussian, data
 
     elif distribution_fitting_method == "Mixed Weibull":
         fitted_mixed_weibull, data = calculate_Weibull_parameters(bin_edges[:-1],number_of_shots)
-        a1, b1, a2, b2, p1, = fitted_mixed_weibull.alpha_1, fitted_mixed_weibull.beta_1, fitted_mixed_weibull.alpha_2, fitted_mixed_weibull.beta_2, fitted_mixed_weibull.proportion_1
-        #print(a1,b1,a2,b2,p1)
-        generated_data = generate_mixed_weibull(a1, b1, a2, b2, p1, no_of_shots)
+        
+        fitted_distribution = dist.MixedWeibull(fitted_mixed_weibull.alpha_1, fitted_mixed_weibull.beta_1, fitted_mixed_weibull.alpha_2, fitted_mixed_weibull.beta_2, fitted_mixed_weibull.proportion_1)
+        generated_data = fitted_distribution.generate_random_numbers(no_of_shots)
         
         return generated_data, fitted_mixed_weibull, data
-'''
-def test():
-    bin_values = [2., 1.6, 1.4, 1.25, 1.12, 1., 0.9, 0.8, 0.71, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.]
-    frequency = [0.0, 0.1, 2.4, 46.3, 42.4, 24.8, 5.6, 5.3, 5.3, 8.8, 9.7, 7.1, 1.7, 0.2, 0.1, 0.0]
-    bin_values, frequency = sort_data(bin_values,frequency)
-    
-    generated = []
-    for i in range(100):
-        generated_data,fitted_distribution,data = generate_sphere_from_sieve_analysis_data(bin_values,frequency,"Mixed Weibull",0.0078,no_of_shots=1)
-        generated.extend(generated_data)
-        #print(generated)
-
-    visualize_histogram(generated,bin_values,data, fitted_distribution)
-    #print(generated_data)
-test()
 '''

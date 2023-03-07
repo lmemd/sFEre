@@ -4,9 +4,9 @@ from sphere_generator.shot_stream_generator import shot_stream
 from sphere_generator.utilities import *
 import os
 
-
 def main():
     #**************************************INPUT SECTION******************************************
+    filename_to_export = "demo_batch_of_spheres" # name of sphere file
     filename_to_export = "demo_batch_of_spheres" # name of sphere file
     mean_radius = 0.5 # average radius of created sphere
     radius_std = 0.2 # standard deviation of radius for the created sphere
@@ -24,6 +24,7 @@ def main():
 
     parent_dir = os.getcwd()
     directory = parent_dir + '/generated_spheres/' #the directory for the final output
+
 
     # Define if your problem is in 2 dimensional or 3 dimensional space (2D or 3D)
     # If the problem is 2D, only length and height of the box are taken into account
@@ -44,9 +45,11 @@ def main():
         
         # Change the filename according to current index of set number
         filename = f"{filename_to_export}_{set_number + 1}"
+        filename = f"{filename_to_export}_{set_number + 1}"
         
         # Define FE mesh and spacing method
         # process and output of meshed generated spheres
+        mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA")
         mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA")
 
         # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
