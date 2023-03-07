@@ -3,9 +3,10 @@ import sys
 import sphere_generator
 from FE_mesh.configure_sphere_entity import sphere_entity
 from FE_mesh.LSDYNA_keyword_manager import output_keyword_file, output_general_file
+from FE_mesh.utilities import working_directory
+import os
 
-
-def mesh_interface(mesh_method, spacing_method, spheres, element_length, filename, output_option, pid = 1, renumbering_point = 0):
+def mesh_interface(mesh_method, spacing_method, spheres, element_length, filename, output_path,  output_option, pid = 1, renumbering_point = 0):
     """Generates a batch with multiple spheres, based on given positions,
     radiuses and other characteristics included in the analysis.
 
@@ -15,6 +16,7 @@ def mesh_interface(mesh_method, spacing_method, spheres, element_length, filenam
         spheres (list): List of initialized spheres.
         element_length (float): FE mesh element length.
         filename (str): Name of the batch file.
+        output_path (str) : The name of the output path
         pid (int): PID.
         renumbering_point (int): Renumbering point of the .k file entities.
         initial_velocity (boolean or int/float): Initial velocity of generated spheres.
@@ -22,6 +24,9 @@ def mesh_interface(mesh_method, spacing_method, spheres, element_length, filenam
     Returns:
         list: Nodes and elements of sphere mesh.
     """
+    
+    working_directory(output_path)
+        
     if not isinstance(spheres, list):
         spheres = [spheres]
     
@@ -56,7 +61,7 @@ def mesh_interface(mesh_method, spacing_method, spheres, element_length, filenam
         if output_option == "general":
             output_general_file(nodes_all, elements_all, filename)
         elif output_option == "LSDYNA":
-            output_keyword_file(nodes_all, elements_all, pid, filename)
+            output_keyword_file(nodes_all, elements_all, pid, filename, output_path)
         else:
             print("Nothing was outputed.")
 
