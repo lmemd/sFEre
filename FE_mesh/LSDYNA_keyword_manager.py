@@ -78,7 +78,7 @@ def output_keyword_file(nodes_s, elements_s, pid, filename, velocity = [], angle
         angle (float): Impact angle.
     """
     change_path = os.getcwd()
-    working_directory(change_path + '/generated_spheres/')
+    os.chdir(change_path)
 
     # creating txt files (NEEDS TO BE FIXED)
     np.savetxt('nodes.txt', nodes_s, header="*KEYWORD\n*NODES", fmt="%i,%f,%f,%f", comments="")
@@ -119,7 +119,7 @@ def output_include_file(nodes_s, elements_s, pid, filename, velocity = [], angle
         angle (float): Impact angle.
     """
     change_path = os.getcwd()
-    working_directory(change_path + '/generated_spheres/')
+    os.chdir(change_path)
 
     # creating txt files (NEEDS TO BE FIXED)
     np.savetxt('nodes.txt', nodes_s, header="*KEYWORD\n*NODES", fmt="%i,%f,%f,%f", comments="")
@@ -148,7 +148,7 @@ def output_general_file(nodes_s, elements_s, filename, ending = ".txt"):
         ending (string): Default's '.txt'. Filename's ending.
     """
     change_path = os.getcwd()
-    working_directory(change_path + '/generated_spheres/')
+    os.chdir(change_path)
 
     # creating txt files (NEEDS TO BE FIXED)
     np.savetxt('nodes.txt', nodes_s, header="*KEYWORD\n*NODES", fmt="%i,%f,%f,%f", comments="")
@@ -180,7 +180,8 @@ def apply_initial_velocity(filename, user_initial_velocity, angle, pid = 1):
         TypeError: Error occuring when input type for initial velocity is incompatible.
     """
     change_path = os.getcwd()
-    working_directory(change_path + '/generated_spheres/')
+    os.chdir(change_path)
+    
     if isinstance(user_initial_velocity, (float, int)) and not user_initial_velocity == True or not user_initial_velocity:
         if os.path.exists(f"{filename}.k"):
             initial_velocity(pid, user_initial_velocity, angle)

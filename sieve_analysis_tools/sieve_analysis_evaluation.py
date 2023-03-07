@@ -1,14 +1,10 @@
-from reliability.Fitters import Fit_Weibull_Mixture, Fit_Everything, Fit_Normal_2P
-from reliability.Distributions import Weibull_Distribution, Mixture_Model
 from reliability.Other_functions import histogram
 import numpy as np
 import matplotlib.pyplot as plt
-import math
-from scipy.stats import weibull_min
-import random
-import statistical_tools as st
+import sieve_analysis_tools.statistical_tools as st
+#import statistical_tools as st
 
-def sieve_analysis(d_list, sieve_sizes, rho,):
+def sieve_analysis(d_list, sieve_sizes, rho):
     """
     Perform sieve analysis for spherical particles with given diameters and density, and return
     the retained weight and number of particles on each sieve specified by the given sizes.
@@ -49,7 +45,9 @@ def sieve_analysis(d_list, sieve_sizes, rho,):
     # Return the list of retained weights and number of particles on each sieve
     return weights, num_particles
 
-def plot_sieve_analysis(sieve_sizes, retained_weights, cumulative_weights):
+def plot_sieve_analysis(sieve_sizes, 
+                        retained_weights_generated, retained_weights_measured,
+                        cumulative_weights_generated, cumulative_weights_measured):
     """
     Plots the retained weights and cumulative weights on each sieve.
 
@@ -60,46 +58,78 @@ def plot_sieve_analysis(sieve_sizes, retained_weights, cumulative_weights):
 
     Returns: None
     """
-    fig, ax1 = plt.subplots()
-
-    # Plot retained weights
-    ax1.set_xlabel('Sieve size (mm)')
-    ax1.set_ylabel('Retained weight (g)', color='tab:blue')
-    ax1.plot(sieve_sizes, retained_weights, 'o-', color='tab:blue')
-    ax1.tick_params(axis='y', labelcolor='tab:blue')
-
-    # Plot cumulative weights
-    ax2 = ax1.twinx()
-    ax2.set_ylabel('Cumulative weight (g)', color='tab:red')
-    ax2.plot(sieve_sizes, cumulative_weights, 'o-', color='tab:red')
-    ax2.tick_params(axis='y', labelcolor='tab:red')
-
-    # Set plot title and display plot
-    plt.title('Virtual Sieve Analysis')
+    plt.figure(figsize=(9, 5))
+    plt.plot(sieve_sizes, retained_weights_generated, 'o-', color='tab:blue')
+    plt.plot(sieve_sizes, retained_weights_measured, 'o--', color='tab:blue')
+    plt.title('Retained Weights')
+    plt.xlabel('Sieve size (mm)')
+    plt.ylabel('Retained weight (%)')
+    plt.grid()
     plt.show()
 
+    # Plot cumulative weights
+    plt.figure(figsize=(9, 5))
+    plt.plot(sieve_sizes, cumulative_weights_generated, 'o-', color='tab:red')
+    plt.plot(sieve_sizes, cumulative_weights_measured, 'o--', color='tab:red')
+    plt.title('Cumulative Weights')
+    plt.xlabel('Sieve size (mm)')
+    plt.ylabel('Cumulative weight (%)')
+    plt.grid()
+    plt.show()
+
+
+def evaluate(sieve_levels, measured_retained_weight, generated_spheres, material_density):
+
+    """
+    Evaluates the accuracy of generated spheres by comparing the retained weight distribution of generated spheres
+    to the measured retained weight distribution obtained through a sieve analysis.
+
+    Args:
+    - sieve_levels: a 1D array of desired sieve diameters in mm (float or int).
+    - measured_retained_weight: a 1D array of measured retained weights on each sieve in grams (float).
+    - generated_spheres: a 1D array of generated sphere radii in mm (float).
+    - material_density: the density of the material in g/mm^3 (float).
+
+    Returns: None
+    """
+    
+    bin_values, frequency = st.sort_data(sieve_levels,measured_retained_weight)
+    perform_sieve_analysis, number_retained = sieve_analysis(generated_spheres, bin_values, material_density)
+
+    normalized_generated_retained_weight = st.normalize_frequency(perform_sieve_analysis)
+    normalized_measured_retained_weight = st.normalize_frequency(frequency)
+
+    cumulative_generated_weight = st.calculate_cumulative_frequencies(normalized_generated_retained_weight)
+    cumulative_measured_weight = st.calculate_cumulative_frequencies(normalized_measured_retained_weight)
+
+    plot_sieve_analysis(bin_values, 
+                        normalized_generated_retained_weight,  normalized_measured_retained_weight,
+                        cumulative_generated_weight, cumulative_measured_weight)
+
+'''
 def test():
     bin_values = [2., 1.6, 1.4, 1.25, 1.12, 1., 0.9, 0.8, 0.71, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.]
     frequency = [0.0, 0.1, 2.4, 46.3, 42.4, 24.8, 5.6, 5.3, 5.3, 8.8, 9.7, 7.1, 1.7, 0.2, 0.1, 0.0]
     bin_values, frequency = st.sort_data(bin_values,frequency)
-    #print(bin_values,frequency)
-
 
     generated,fitted_distribution,data = st.generate_sphere_from_sieve_analysis_data(bin_values,frequency,"Mixed Weibull",0.00785,no_of_shots=1000)
     #print(fitted_distribution)
 
-
     st.visualize_histogram(generated,bin_values,data, fitted_distribution)
     
-    
     perform_sieve_analysis, number_retained = sieve_analysis(generated, bin_values, 0.00785)
+    
     normalized_generated_retained_weight = st.normalize_frequency(perform_sieve_analysis)
     normalized_measured_retained_weight = st.normalize_frequency(frequency)
-    print(number_retained)
-    plt.plot(bin_values,normalized_generated_retained_weight)
-    plt.plot(bin_values,normalized_measured_retained_weight)
-    #print(normalized_retained_weight)
-    plt.show()
+
+    cumulative_generated_weight = st.calculate_cumulative_frequencies(normalized_generated_retained_weight)
+    cumulative_measured_weight = st.calculate_cumulative_frequencies(normalized_measured_retained_weight)
+
+    plot_sieve_analysis(bin_values, 
+                        normalized_generated_retained_weight,  normalized_measured_retained_weight,
+                        cumulative_generated_weight, cumulative_measured_weight)
+
     
     #print(perform_sieve_analysis[0],perform_sieve_analysis[0])
 test()
+'''
