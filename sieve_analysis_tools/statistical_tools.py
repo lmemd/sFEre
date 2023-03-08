@@ -168,13 +168,14 @@ def calculate_Gaussian_parameters(bin_values, frequency):
     return results, all_data
 
 #Debuggin code
-'''
+
 def generate_sphere_from_sieve_analysis_data(sieves,retained_weight,distribution_fitting_method,shots_material_density,no_of_shots=1):
     
     bin_edges, weight_per_sieve = sort_data(sieves, retained_weight)
     bin_centers = calculate_bin_centers(bin_edges)
     number_of_shots = calculate_number_of_shots(bin_centers, weight_per_sieve,shots_material_density)
-    print(number_of_shots)
+
+    #print(bin_centers,number_of_shots)
 
     if distribution_fitting_method == "Gaussian" or distribution_fitting_method == "Normal":
 
@@ -182,13 +183,13 @@ def generate_sphere_from_sieve_analysis_data(sieves,retained_weight,distribution
         fitted_distribution = dist.GaussianDistribution(fitted_gaussian.mu, fitted_gaussian.sigma)
         generated_data =fitted_distribution.generate_random_numbers(no_of_shots)
 
-        return generated_data, fitted_gaussian, data
+        return generated_data
 
     elif distribution_fitting_method == "Mixed Weibull":
         fitted_mixed_weibull, data = calculate_Weibull_parameters(bin_edges[:-1],number_of_shots)
         
         fitted_distribution = dist.MixedWeibull(fitted_mixed_weibull.alpha_1, fitted_mixed_weibull.beta_1, fitted_mixed_weibull.alpha_2, fitted_mixed_weibull.beta_2, fitted_mixed_weibull.proportion_1)
         generated_data = fitted_distribution.generate_random_numbers(no_of_shots)
+
         
-        return generated_data, fitted_mixed_weibull, data
-'''
+        return generated_data
