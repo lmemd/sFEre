@@ -105,31 +105,35 @@ def evaluate(sieve_levels, measured_retained_weight, generated_spheres, material
     plot_sieve_analysis(bin_values, 
                         normalized_generated_retained_weight,  normalized_measured_retained_weight,
                         cumulative_generated_weight, cumulative_measured_weight)
+    
+    normalized_number_generated = st.normalize_frequency(number_retained)
+    cumulative_number_generated = st.calculate_cumulative_frequencies(normalized_number_generated)
 
-'''
+
+    bin_centers = st.calculate_bin_centers(bin_values)  
+
+    number_measured = st.calculate_number_of_shots(bin_centers, frequency,material_density)
+    normalized_number_measured = np.append(st.normalize_frequency(number_measured),0)
+    cumulative_number_measured = st.calculate_cumulative_frequencies(normalized_number_measured)
+
+    plot_sieve_analysis(bin_values, 
+                        normalized_number_generated,  normalized_number_measured,
+                        cumulative_number_generated, cumulative_number_measured)
+
+
 def test():
     bin_values = [2., 1.6, 1.4, 1.25, 1.12, 1., 0.9, 0.8, 0.71, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.]
     frequency = [0.0, 0.1, 2.4, 46.3, 42.4, 24.8, 5.6, 5.3, 5.3, 8.8, 9.7, 7.1, 1.7, 0.2, 0.1, 0.0]
-    bin_values, frequency = st.sort_data(bin_values,frequency)
 
-    generated,fitted_distribution,data = st.generate_sphere_from_sieve_analysis_data(bin_values,frequency,"Mixed Weibull",0.00785,no_of_shots=1000)
-    #print(fitted_distribution)
+    generated = []
+    for i in range(10):
+        generated_data = st.generate_sphere_from_sieve_analysis_data(bin_values,frequency,"Mixed Weibull",0.00785,no_of_shots=1)
+        generated.append(generated_data)
+    #print(fitted_distribution.__dict__)
 
-    st.visualize_histogram(generated,bin_values,data, fitted_distribution)
+    #st.visualize_histogram(generated,bin_values,data, fitted_distribution)
     
-    perform_sieve_analysis, number_retained = sieve_analysis(generated, bin_values, 0.00785)
-    
-    normalized_generated_retained_weight = st.normalize_frequency(perform_sieve_analysis)
-    normalized_measured_retained_weight = st.normalize_frequency(frequency)
+    #evaluate(bin_values,frequency,generated_data,0.00785)
 
-    cumulative_generated_weight = st.calculate_cumulative_frequencies(normalized_generated_retained_weight)
-    cumulative_measured_weight = st.calculate_cumulative_frequencies(normalized_measured_retained_weight)
-
-    plot_sieve_analysis(bin_values, 
-                        normalized_generated_retained_weight,  normalized_measured_retained_weight,
-                        cumulative_generated_weight, cumulative_measured_weight)
-
-    
-    #print(perform_sieve_analysis[0],perform_sieve_analysis[0])
-test()
-'''
+if __name__ == "__main__":
+    test()

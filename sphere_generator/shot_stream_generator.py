@@ -90,19 +90,19 @@ class shot_stream:
         bin_centers = st.calculate_bin_centers(bin_edges)  
 
         number_of_shots = st.calculate_number_of_shots(bin_centers, weight_per_sieve,self.shot_material_density)
-    
-        # Fit a mixed Weibull distribution
+
+        # Fit a Gaussian distribution
         if self.fitting_distribution == "Gaussian":
             
             fitted_gaussian, data = st.calculate_Gaussian_parameters(bin_edges[:-1], number_of_shots)            
             fitted_distribution = dist.GaussianDistribution(fitted_gaussian.mu, fitted_gaussian.sigma)
         
-        # Otherwise, fit a Gaussian distribution
+        # Otherwise, fit a Mixed Weibull distribution
         elif self.fitting_distribution == "Mixed Weibull":       
             
-            fitted_mixed_weibull, data = st.calculate_Weibull_parameters(bin_edges[:-1], number_of_shots)            
+            fitted_mixed_weibull, data = st.calculate_Weibull_parameters(bin_edges[:-1], number_of_shots)           
             fitted_distribution = dist.MixedWeibull(fitted_mixed_weibull.alpha_1, fitted_mixed_weibull.beta_1, fitted_mixed_weibull.alpha_2, fitted_mixed_weibull.beta_2, fitted_mixed_weibull.proportion_1)
-
+        print(fitted_distribution.__dict__)
         return fitted_distribution
 
     def random_sphere_inside_box(self,r):
@@ -190,6 +190,7 @@ class shot_stream:
         #Check if sieve analysis data exist
         if self.sieve_analysis_data is not None:
             distribution = self.fit_sieve_distribution()
+            #print(distribution,distribution.__dict__)
             custom_distribution_flag = True
         
         #Loop for each shot
@@ -200,16 +201,17 @@ class shot_stream:
             #####################################################
             
             if custom_distribution_flag:
-                r = distribution.generate_random_numbers(1)[0]/2
+                r = random.choice(distribution.generate_random_numbers(100)/2)
+                print(r)
             else:
                 r = random.gauss(self.mean_radius,self.radius_standard_deviation)
             s = self.random_sphere_inside_box(r)
             ######################################################
-
+            spheres.append(s)
             #check if size criteria are satisfied
-            if not s.y < s.r + 0.01 and not self.intersects_existing(s,spheres):
-                spheres.append(s) #add the created sphere to the list
-                no_sphere_loops = 0 #zero-out the sphere loops iterator
+            #if not s.y < s.r + 0.01 and not self.intersects_existing(s,spheres):
+            #    spheres.append(s) #add the created sphere to the list
+            #    no_sphere_loops = 0 #zero-out the sphere loops iterator
         return spheres
 
     def intersects_existing(self,sph,spheres):

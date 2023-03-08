@@ -10,7 +10,7 @@ def main():
     filename_to_export = "demo_batch_of_spheres" # name of sphere file
     mean_radius = 0.5 # average radius of created sphere
     radius_std = 0.2 # standard deviation of radius for the created sphere
-    spheres_number = 10 # total number of sphere created
+    spheres_number = 100 # total number of sphere created
     spheres_batches = 1 # change this variable if you want to create more than one batch of shots
     shots_material_density = 0.00785 #in gm/mm^3
 
@@ -23,9 +23,9 @@ def main():
     element_length = 0.04
 
     # Define the domain characteristics (the space that contains the created spheres)
-    box_width = 5 # width of the domain containing the spheres (alongside X axis)
-    box_length = 5 # length of the domain containing the spheres (alongside Z axis)
-    box_height = 40 # height of the domain containing the spheres (alongside Y axis)
+    box_width = 2000 # width of the domain containing the spheres (alongside X axis)
+    box_length = 2000 # length of the domain containing the spheres (alongside Z axis)
+    box_height = 8000 # height of the domain containing the spheres (alongside Y axis)
     box_angle = 90 # change this value if you want an inlcined box (defined by the angle between the box and the XZ plane)
 
     parent_dir = os.getcwd()
@@ -66,13 +66,14 @@ def main():
         #apply_initial_velocity(filename, 70, box_angle)
 
         spheres_list.extend(spheres)
-
+        print(set_number)
+    
     # 3D plot of generated spheres        
     #stream.plot_spheres(spheres_list)
     #stream.plot_coverage(spheres_list)
 
     generated_diameters = [s.r*2 for s in spheres_list]
-
+    
     s.evaluate(sieve_levels, retained_weight, generated_diameters, shots_material_density)
 
 
