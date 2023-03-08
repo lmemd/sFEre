@@ -206,12 +206,13 @@ class shot_stream:
             else:
                 r = random.gauss(self.mean_radius,self.radius_standard_deviation)
             s = self.random_sphere_inside_box(r)
+            
             ######################################################
             spheres.append(s)
             #check if size criteria are satisfied
-            #if not s.y < s.r + 0.01 and not self.intersects_existing(s,spheres):
-            #    spheres.append(s) #add the created sphere to the list
-            #    no_sphere_loops = 0 #zero-out the sphere loops iterator
+            if not s.y < s.r + 0.01 and not self.intersects_existing(s,spheres):
+                spheres.append(s) #add the created sphere to the list
+                no_sphere_loops = 0 #zero-out the sphere loops iterator
         return spheres
 
     def intersects_existing(self,sph,spheres):
