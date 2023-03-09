@@ -10,9 +10,10 @@ def main():
     filename_to_export = "demo_batch_of_spheres" # name of sphere file
     mean_radius = 0.5 # average radius of created sphere
     radius_std = 0.2 # standard deviation of radius for the created sphere
-    spheres_number = 100 # total number of sphere created
+    spheres_number = 1 # total number of sphere created
     spheres_batches = 1 # change this variable if you want to create more than one batch of shots
     shots_material_density = 0.00785 #in gm/mm^3
+    nominal_velocity = 70 #in m/s
 
     sieve_levels = [2., 1.6, 1.4, 1.25, 1.12, 1., 0.9, 0.8, 0.71, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.]
     retained_weight = [0.0, 0.1, 2.4, 46.3, 42.4, 24.8, 5.6, 5.3, 5.3, 8.8, 9.7, 7.1, 1.7, 0.2, 0.1, 0.0]
@@ -23,9 +24,9 @@ def main():
     element_length = 0.04
 
     # Define the domain characteristics (the space that contains the created spheres)
-    box_width = 2000 # width of the domain containing the spheres (alongside X axis)
-    box_length = 2000 # length of the domain containing the spheres (alongside Z axis)
-    box_height = 8000 # height of the domain containing the spheres (alongside Y axis)
+    box_width = 2 # width of the domain containing the spheres (alongside X axis)
+    box_length = 2 # length of the domain containing the spheres (alongside Z axis)
+    box_height = 4 # height of the domain containing the spheres (alongside Y axis)
     box_angle = 90 # change this value if you want an inlcined box (defined by the angle between the box and the XZ plane)
 
     parent_dir = os.getcwd()
@@ -59,11 +60,16 @@ def main():
         
         # Define FE mesh and spacing method
         # process and output of meshed generated spheres
-        #mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA")
+        mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA")
 
         # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
         # Currently, an absolute initial velocity of 70 m/s will be applied.
-        #apply_initial_velocity(filename, 70, box_angle)
+        stream_velocity_configuration = (nominal_velocity,nominal_velocity/5)
+        
+        
+        
+        
+        apply_initial_velocity(filename, nominal_velocity, "Normal distribution", *stream_velocity_configuration, angle = box_angle)
 
         spheres_list.extend(spheres)
         print(set_number)

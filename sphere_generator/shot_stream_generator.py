@@ -7,7 +7,6 @@ import math
 from matplotlib import pyplot as plt
 import numpy as np
 from sieve_analysis_tools import statistical_tools as st
-from reliability.Distributions import Weibull_Distribution, Mixture_Model, Normal_Distribution
 import sieve_analysis_tools.distributions as dist
 import sieve_analysis_tools.statistical_tools as st
 
@@ -190,7 +189,7 @@ class shot_stream:
         #Check if sieve analysis data exist
         if self.sieve_analysis_data is not None:
             distribution = self.fit_sieve_distribution()
-            #print(distribution,distribution.__dict__)
+            print(distribution,distribution.__dict__)
             custom_distribution_flag = True
         
         #Loop for each shot
@@ -201,7 +200,7 @@ class shot_stream:
             #####################################################
             
             if custom_distribution_flag:
-                r = random.choice(distribution.generate_random_numbers(100)/2)
+                r = random.choice(distribution.generate_random_numbers(200)/2)
                 print(r)
             else:
                 r = random.gauss(self.mean_radius,self.radius_standard_deviation)
@@ -209,10 +208,12 @@ class shot_stream:
             
             ######################################################
             spheres.append(s)
+            
             #check if size criteria are satisfied
             if not s.y < s.r + 0.01 and not self.intersects_existing(s,spheres):
                 spheres.append(s) #add the created sphere to the list
                 no_sphere_loops = 0 #zero-out the sphere loops iterator
+            print("No sphere iterations: ", no_sphere_loops)
         return spheres
 
     def intersects_existing(self,sph,spheres):
