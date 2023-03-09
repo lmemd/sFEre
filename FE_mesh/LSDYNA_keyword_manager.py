@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from FE_mesh.utilities import working_directory, merge_txt_files
-
+from sieve_analysis_tools import velocity_stochasticity as vs
 
 def section(PID, MID = 1000000, ELFORM = 1):
     """This function defines a section, which 
@@ -166,7 +166,7 @@ def output_general_file(nodes_s, elements_s, filename, ending = ".txt"):
     os.chdir(change_path)
 
     
-def apply_initial_velocity(filename, user_initial_velocity, angle, pid = 1):
+def apply_initial_velocity(filename, user_initial_velocity, velocity_stochasticity_option, *stochasticity_args,angle, pid = 1):
     """Applies (or not) initial velocity to sphere entities.
     ONLY FOR LSDYNA file form!!!
 
@@ -175,6 +175,7 @@ def apply_initial_velocity(filename, user_initial_velocity, angle, pid = 1):
         nodes (array): Nodes matrix.
         elements (array): Elements matrix. 
         pid (int): PID.
+        velocity_stochasticity_option (str): The option to apply stochasticity to initial velocity
         initial_velocity (float): Initial velocity to be applied.
         angle (float): Impact angle to be applied.
 
@@ -185,6 +186,12 @@ def apply_initial_velocity(filename, user_initial_velocity, angle, pid = 1):
     os.chdir(change_path)
     
     if isinstance(user_initial_velocity, (float, int)) and not user_initial_velocity == True or not user_initial_velocity:
+        
+        #feature for application of stochastic velocity to the stream added
+        if velocity_stochasticity_option == "Normal distribution":
+            user_initial_velocity = vs.normally_distributed_velocity(*stochasticity_args)[0]
+            print("applied velocity: ", user_initial_velocity)
+              
         if os.path.exists(f"{filename}.k"):
             initial_velocity(pid, user_initial_velocity, angle)
             with open("initial_velocity.txt", "r+") as f:

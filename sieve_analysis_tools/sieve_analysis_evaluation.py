@@ -47,7 +47,8 @@ def sieve_analysis(d_list, sieve_sizes, rho):
 
 def plot_sieve_analysis(sieve_sizes, 
                         retained_weights_generated, retained_weights_measured,
-                        cumulative_weights_generated, cumulative_weights_measured):
+                        cumulative_weights_generated, cumulative_weights_measured,
+                        title = None):
     """
     Plots the retained weights and cumulative weights on each sieve.
 
@@ -55,13 +56,14 @@ def plot_sieve_analysis(sieve_sizes,
     - sieve_sizes: a 1D array of desired sieve diameters in mm (float or int).
     - retained_weights: a 1D array of retained weights on each sieve in grams (float).
     - cumulative_weights: a 1D array of cumulative weights on each sieve in grams (float).
+    - title (str) : the title of the created set of plot 
 
     Returns: None
     """
     plt.figure(figsize=(9, 5))
     plt.plot(sieve_sizes, retained_weights_generated, 'o-', color='tab:blue')
     plt.plot(sieve_sizes, retained_weights_measured, 'o--', color='tab:blue')
-    plt.title('Retained Weights')
+    plt.title(title)
     plt.xlabel('Sieve size (mm)')
     plt.ylabel('Retained weight (%)')
     plt.grid()
@@ -104,7 +106,8 @@ def evaluate(sieve_levels, measured_retained_weight, generated_spheres, material
 
     plot_sieve_analysis(bin_values, 
                         normalized_generated_retained_weight,  normalized_measured_retained_weight,
-                        cumulative_generated_weight, cumulative_measured_weight)
+                        cumulative_generated_weight, cumulative_measured_weight,
+                        "Percentage weight")
     
     normalized_number_generated = st.normalize_frequency(number_retained)
     cumulative_number_generated = st.calculate_cumulative_frequencies(normalized_number_generated)
@@ -118,7 +121,8 @@ def evaluate(sieve_levels, measured_retained_weight, generated_spheres, material
 
     plot_sieve_analysis(bin_values, 
                         normalized_number_generated,  normalized_number_measured,
-                        cumulative_number_generated, cumulative_number_measured)
+                        cumulative_number_generated, cumulative_number_measured,
+                        "Percentage number")
 
 
 def test():
@@ -129,11 +133,11 @@ def test():
     for i in range(10):
         generated_data = st.generate_sphere_from_sieve_analysis_data(bin_values,frequency,"Mixed Weibull",0.00785,no_of_shots=1)
         generated.append(generated_data)
-    #print(fitted_distribution.__dict__)
+
 
     #st.visualize_histogram(generated,bin_values,data, fitted_distribution)
     
-    #evaluate(bin_values,frequency,generated_data,0.00785)
+    evaluate(bin_values,frequency,generated_data,0.00785)
 
 if __name__ == "__main__":
     test()
