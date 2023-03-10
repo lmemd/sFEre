@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import truncnorm
-import distributions as dist
+import sieve_analysis_tools.distributions as dist
 
 def normally_distributed_velocity(nominal_velocity, standard_deviation, lower_cuttof = 0, upper_cutoff = np.inf):
     """
@@ -68,8 +68,8 @@ def mixed_random_velocities_generator(mean, std, lower_cutoff, upper_cutoff, low
     return random_num
 
 
-def mixed_random_velocities(nominal_velocity, percentage_of_retainment, 
-                          mean_reduced, std_reduced, reduced_value_range, retained_proportional_factor):
+def mixed_random_velocities(nominal_velocity, retained_initial_velocity, 
+                            reduced_velocity, std_reduced, reduced_value_range, percentage_of_retained_velocity):
     
     '''
     Generates a random velocity value for an impact event, based on a given nominal velocity and other parameters. 
@@ -88,19 +88,19 @@ def mixed_random_velocities(nominal_velocity, percentage_of_retainment,
         A random velocity value for the impact event.
     '''
 
-    lower_bound_percentage_of_retainement = (100 - percentage_of_retainment)/100
+    lower_bound_percentage_of_retainement = (100 - retained_initial_velocity)/100
     upper_bound_percentage_of_retainement = 1
 
-    mean_reduced_normalized = mean_reduced/nominal_velocity
+    mean_reduced_normalized = reduced_velocity/nominal_velocity
     std_reduced_normalized = std_reduced/nominal_velocity
 
-    lower_value_cutoff = reduced_value_range[0]
-    upper_value_cutoff = reduced_value_range[1]
+    lower_value_cutoff = reduced_value_range[0]/nominal_velocity
+    upper_value_cutoff = reduced_value_range[1]/nominal_velocity
 
     velocity = mixed_random_velocities_generator(mean_reduced_normalized, std_reduced_normalized, 
                             lower_value_cutoff, upper_value_cutoff, 
                             lower_bound_percentage_of_retainement, upper_bound_percentage_of_retainement, 
-                            retained_proportional_factor)
+                            percentage_of_retained_velocity/100)
     
     return velocity*nominal_velocity
 
