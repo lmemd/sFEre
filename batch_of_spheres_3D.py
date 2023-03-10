@@ -39,7 +39,12 @@ def main():
     for set_number in range(spheres_batches):
 
         # Generate stream of random distributed shots in space
-        stream = shot_stream(spheres_number, problem_dimensions, box, box_angle,0.0078, mean_radius, radius_std)
+        stream = shot_stream(spheres_number, 
+                            problem_dimensions, 
+                            box, 
+                            box_angle, 
+                            mean_radius_setter=mean_radius,
+                            radius_standard_deviation_setter=radius_std)
         spheres = stream.generate() # Create the stream
         
         # Change the filename according to current index of set number

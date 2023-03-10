@@ -1,4 +1,3 @@
-from FE_mesh.configure_shots_mesh import mesh_generator
 from sphere_generator.shot_stream_generator import shot_stream
 from sphere_generator.utilities import *
 
@@ -35,7 +34,12 @@ def main():
     for set_number in range(spheres_batches):
 
         # Generate stream of random distributed shots in space
-        stream = shot_stream(spheres_number, problem_dimensions, box, box_angle, mean_radius, radius_std)
+        stream = shot_stream(spheres_number, 
+                            problem_dimensions, 
+                            box, 
+                            box_angle, 
+                            mean_radius_setter=mean_radius,
+                            radius_standard_deviation_setter=radius_std)
         spheres = stream.generate() # Create the stream
         spheres_list.extend(spheres)
         
