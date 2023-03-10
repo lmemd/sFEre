@@ -37,27 +37,23 @@ def normally_distributed_velocity(nominal_velocity, standard_deviation, lower_cu
     
     return velocity
 
-def mixed_velocities(nominal_velocity, percentage_of_retainment, 
-                          mean_reduced, std_reduced, reduced_value_range, retained_proportional_factor ):
-    
-    lower_bound_percentage_of_retainement = (100 - percentage_of_retainment)/100
-    upper_bound_percentage_of_retainement = 1
+def mixed_random_velocities_generator(mean, std, lower_cutoff, upper_cutoff, lower_range, upper_range, gaussian_weight = 0.5):
+    '''
+    Generates a random number from a mixture of a truncated Gaussian distribution and a uniform distribution with the given mean, standard deviation, range, and cutoff limits. The `gaussian_weight` parameter determines the weight of the Gaussian distribution in the mixture.
 
-    mean_reduced_normalized = mean_reduced/nominal_velocity
-    std_reduced_normalized = std_reduced/nominal_velocity
+    Parameters:
+        - mean: Mean of the mixed distribution
+        - std: Standard deviation of the mixed distribution
+        - lower_cutoff: Lower cutoff limit for the truncated Gaussian distribution
+        - upper_cutoff: Upper cutoff limit for the truncated Gaussian distribution
+        - lower_range: Lower limit for the uniform distribution
+        - upper_range: Upper limit for the uniform distribution
+        - gaussian_weight: Weight of the Gaussian distribution in the mixture (default: 0.5)
 
-    lower_value_cutoff = reduced_value_range[0]
-    upper_value_cutoff = reduced_value_range[1]
+    Returns:
+        A random number from the mixed distribution.
+    '''
 
-    return mean_reduced_normalized, std_reduced_normalized, lower_value_cutoff, upper_value_cutoff, lower_bound_percentage_of_retainement, upper_bound_percentage_of_retainement, retained_proportional_factor
-
-def mixed_random_velocities(mean, std, lower_cutoff, upper_cutoff, lower_range, upper_range, gaussian_weight = 0.5):
-    """
-    Generates a random number from a mixture of a truncated Gaussian distribution and
-    a uniform distribution with the given mean, standard deviation, range, and cutoff limits.
-    The `gaussian_weight` parameter determines the weight of the Gaussian distribution
-    in the mixture.
-    """
     # Generate a random number from the truncated Gaussian distribution
     a = (lower_cutoff - mean) / std
     b = (upper_cutoff - mean) / std
@@ -72,46 +68,79 @@ def mixed_random_velocities(mean, std, lower_cutoff, upper_cutoff, lower_range, 
     return random_num
 
 
-test = mixed_velocities(70, 10, 70*0.6, 70*0.27, [0.2,1], 0.75)
-
-
-number = 20000
-vels = []
-for i in range(number):
-    vels.append(mixed_random_velocities(*test))
-
-# Create the histogram
-hist, bins = np.histogram(vels, density=False)
-
-# Calculate the bin width
-bin_width = bins[1] - bins[0]
-
-# Convert the counts to percentages
-hist_percent = (hist / float(len(vels))) * 100.0 * bin_width
-
-# Plot the histogram in percentage
-plt.bar(bins[:-1], hist_percent, width=bin_width)
-plt.xlabel('Data')
-plt.ylabel('Percentage')
-plt.show()
-
-
-
-
-
-
-def print_tuple(*init_velocity_args):
-    """
-    Print each item in a tuple.
+def mixed_random_velocities(nominal_velocity, percentage_of_retainment, 
+                          mean_reduced, std_reduced, reduced_value_range, retained_proportional_factor):
+    
+    '''
+    Generates a random velocity value for an impact event, based on a given nominal velocity and other parameters. 
+    The function uses `mixed_random_velocities_generator` to generate the random velocity value from a mixture of a 
+    truncated Gaussian distribution and a uniform distribution.
 
     Parameters:
-    -----------
-    *args : tuple
-        A tuple with an unknown number of items.
-    """
-    print(init_velocity_args[0])
-    for item in init_velocity_args:
-        print(item)
+        - nominal_velocity: Nominal velocity for the impact event
+        - percentage_of_retainment: Percentage of the nominal velocity that is retained after the impact
+        - mean_reduced: Mean of the mixed distribution for the reduced velocity
+        - std_reduced: Standard deviation of the mixed distribution for the reduced velocity
+        - reduced_value_range: Range of values for the reduced velocity
+        - retained_proportional_factor: Weight of the reduced velocity in the mixture
+
+    Returns:
+        A random velocity value for the impact event.
+    '''
+
+    lower_bound_percentage_of_retainement = (100 - percentage_of_retainment)/100
+    upper_bound_percentage_of_retainement = 1
+
+    mean_reduced_normalized = mean_reduced/nominal_velocity
+    std_reduced_normalized = std_reduced/nominal_velocity
+
+    lower_value_cutoff = reduced_value_range[0]
+    upper_value_cutoff = reduced_value_range[1]
+
+    velocity = mixed_random_velocities_generator(mean_reduced_normalized, std_reduced_normalized, 
+                            lower_value_cutoff, upper_value_cutoff, 
+                            lower_bound_percentage_of_retainement, upper_bound_percentage_of_retainement, 
+                            retained_proportional_factor)
+    
+    return velocity*nominal_velocity
+
+def visualize_velocity_distribution(velocities):
+    '''
+    Visualizes the distribution of velocities generated by `mixed_random_velocities` function.
+
+    Parameters:
+        - velocities: List of velocity values generated by `mixed_random_velocities` function.
+
+    Returns:
+        None.
+    '''
+    hist, bins = np.histogram(velocities, bins = 10, density=False)
+
+    # Calculate the bin width
+    bin_width = bins[1] - bins[0]
+
+    # Convert the counts to percentages
+    hist_percent = (hist / float(len(vels))) * 100.0
+
+    # Plot the histogram in percentage
+    plt.bar(bins[:-1], hist_percent, width=bin_width, color = "red", alpha = 0.3, edgecolor = "black")
+    plt.xlabel('Impact velocities')
+    plt.ylabel('Percentage of shots')
+    plt.grid()
+    plt.show()
+
+def test():
+    velocity_params = (70, 10, 70*0.65, 70*0.2, [0.2,1], 0.5)
+    number = 20000
+    
+    vels = []
+    for i in range(number):
+        vels.append(mixed_random_velocities(*velocity_params))
+
+    visualize_velocity_distribution(vels)
+
+if __name__ == "__main__":
+    test()
 
 
 
