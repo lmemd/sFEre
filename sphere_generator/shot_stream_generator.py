@@ -194,7 +194,7 @@ class shot_stream:
         
         #Loop for each shot
         #####################################################
-        while len(spheres) < self.number_of_spheres and no_sphere_loops <= 2e2:
+        while len(spheres) < self.number_of_spheres and no_sphere_loops <= 2e3:
             
             #create and allocate the sphere in space
             #####################################################
@@ -207,13 +207,19 @@ class shot_stream:
             s = self.random_sphere_inside_box(r)
             
             ######################################################
-            spheres.append(s)
+            #spheres.append(s)
             
             #check if size criteria are satisfied
-            if not s.y < s.r + 0.01 and not self.intersects_existing(s,spheres):
+            intersection = self.intersects_existing(s,spheres)
+            if not intersection:
                 spheres.append(s) #add the created sphere to the list
                 no_sphere_loops = 0 #zero-out the sphere loops iterator
-            print("No sphere iterations: ", no_sphere_loops)
+            else:
+                no_sphere_loops += 1
+
+        if self.number_of_spheres > len(spheres):
+                print("Requested number of spheres could not be achieved due to intersections, a total of " + str(len(spheres)) + " created instead.")
+        
         return spheres
 
     def intersects_existing(self,sph,spheres):
@@ -230,8 +236,9 @@ class shot_stream:
      
         for s in spheres:
             dist = math.sqrt((sph.x-s.x)**2 + (sph.y-s.y)**2 + (sph.z-s.z)**2)
-            if dist <= s.r + sph.r:
+            if dist < s.r + sph.r:
                 return True
+
         return False
 
     def plot_coverage(self,spheres):
