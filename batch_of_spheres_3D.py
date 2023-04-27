@@ -19,7 +19,7 @@ def main():
     # Define the domain characteristics (the space that contains the created spheres)
     box_width = 2 # width of the domain containing the spheres (alongside X axis)
     box_length = 2 # length of the domain containing the spheres (alongside Z axis)
-    box_height = 4 # height of the domain containing the spheres (alongside Y axis)
+    box_height = 5 # height of the domain containing the spheres (alongside Y axis)
     box_angle = 90 # change this value if you want an inlcined box (defined by the angle between the box and the XZ plane)
 
     parent_dir = os.getcwd()
@@ -53,18 +53,18 @@ def main():
         
         # Define FE mesh and spacing method
         # process and output of meshed generated spheres
-        mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA")
+        mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA-entities", pid = 1000000, renumbering_point=10000000)
 
         # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
         # Currently, an absolute initial velocity of 70 m/s will be applied.
         #apply_initial_velocity(filename, 75, box_angle)
         velocity_params = (70, 70*0.05)
-        applied_velocity = apply_initial_velocity(filename, 75, "Normal distribution", *velocity_params, angle = box_angle)
+        applied_velocity = apply_initial_velocity(filename, 75, "Normal distribution", *velocity_params, angle = box_angle, pid=1000000)
         spheres_list.extend(spheres)
 
         # 3D plot of generated spheres        
-        stream.plot_spheres(spheres_list)
-        stream.plot_coverage(spheres_list)
+        #stream.plot_spheres(spheres_list)
+    stream.plot_coverage(spheres_list)
 
     
 
