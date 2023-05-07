@@ -7,24 +7,24 @@ from sieve_analysis_tools import sieve_analysis_evaluation as s
 
 def main():
     #**************************************INPUT SECTION******************************************
-    filename_to_export = "demo_batch_of_spheres" # name of sphere file
-    spheres_number = 1 # total number of sphere created
-    spheres_batches = 100 # change this variable if you want to create more than one batch of shots
+    filename_to_export = "S460_mixed_shots_70_90_No" # name of sphere file
+    spheres_number = 5 # total number of sphere created
+    spheres_batches = 14 # change this variable if you want to create more than one batch of shots
     shots_material_density = 0.00785 #in gm/mm^3
-    nominal_velocity = 70 #in m/s
+    #nominal_velocity = 70 #in m/s
 
     #Define the impact velocity configuration
-    retained_initial_velocity = 10 #the velocity range of the shots that retain their initial velocity
-    velocity_reduction_factor = 0.65 #velocity reduction due to shot-shot collision
-    reduced_velocity_standard_deviation_factor = 0.2 #the deviation of reduced velocity
-    velocity_range = [nominal_velocity*0.3 , nominal_velocity*1] #the normalized range for the impact velocities
-    percentage_of_retainment = 50 #the percentage of shots that their initial velocity is reduced
-    velocity_stochasticity_approach = "Mixed Random"
+    #retained_initial_velocity = 10 #the velocity range of the shots that retain their initial velocity
+    #velocity_reduction_factor = 0.65 #velocity reduction due to shot-shot collision
+    #reduced_velocity_standard_deviation_factor = 0.2 #the deviation of reduced velocity
+    #velocity_range = [nominal_velocity*0.3 , nominal_velocity*1] #the normalized range for the impact velocities
+    #percentage_of_retainment = 50 #the percentage of shots that their initial velocity is reduced
+    #velocity_stochasticity_approach = "Mixed Random"
 
-    velocity_params = (nominal_velocity, retained_initial_velocity, 
-                       velocity_reduction_factor*nominal_velocity,
-                       reduced_velocity_standard_deviation_factor*nominal_velocity,
-                       velocity_range, percentage_of_retainment)
+    #velocity_params = (nominal_velocity, retained_initial_velocity, 
+    #                   velocity_reduction_factor*nominal_velocity,
+    #                   reduced_velocity_standard_deviation_factor*nominal_velocity,
+    #                   velocity_range, percentage_of_retainment)
     
     # Input for sphere generation based on measured sieve analysis data
     sieve_levels = [2., 1.6, 1.4, 1.25, 1.12, 1., 0.9, 0.8, 0.71, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.]
@@ -73,14 +73,16 @@ def main():
         
         # Define FE mesh and spacing method
         # process and output of meshed generated spheres
-        mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA")
+        mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA-entities", pid = 1000000, renumbering_point=1000000)
 
         # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
         # Currently, an absolute initial velocity of 70 m/s will be applied.
 
-        applied_velocity = apply_initial_velocity(filename, nominal_velocity, velocity_stochasticity_approach, *velocity_params, angle = box_angle)
+        #applied_velocity = apply_initial_velocity(filename, nominal_velocity, velocity_stochasticity_approach, *velocity_params, angle = box_angle)
+        velocity_params = (70, 70*0.05)
+        applied_velocity = apply_initial_velocity(filename, 75, "Normal distribution", *velocity_params, angle = box_angle, pid=1000000)
 
-        velocities_list.extend(applied_velocity)
+        #velocities_list.extend(applied_velocity)
         spheres_list.extend(spheres)
         print(set_number)
     
