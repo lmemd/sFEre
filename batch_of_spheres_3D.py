@@ -10,16 +10,16 @@ def main():
     filename_to_export = "S460_shots_75_90_No" # name of sphere file
     mean_radius = 1.4/2 # average radius of created sphere
     radius_std = 0.135/2 # standard deviation of radius for the created sphere
-    spheres_number = 3 # total number of sphere created
-    spheres_batches = 10 # change this variable if you want to create more than one batch of shots
+    spheres_number = 4 # total number of sphere created
+    spheres_batches = 17 # change this variable if you want to create more than one batch of shots
 
     # Define FE length for spheres
     element_length = 0.04
 
     # Define the domain characteristics (the space that contains the created spheres)
-    box_width = 2 # width of the domain containing the spheres (alongside X axis)
-    box_length = 2 # length of the domain containing the spheres (alongside Z axis)
-    box_height = 5 # height of the domain containing the spheres (alongside Y axis)
+    box_width = 3 # width of the domain containing the spheres (alongside X axis)
+    box_length = 3 # length of the domain containing the spheres (alongside Z axis)
+    box_height = 4 # height of the domain containing the spheres (alongside Y axis)
     box_angle = 90 # change this value if you want an inlcined box (defined by the angle between the box and the XZ plane)
 
     parent_dir = os.getcwd()
@@ -49,7 +49,7 @@ def main():
         spheres = stream.generate() # Create the stream
         
         # Change the filename according to current index of set number
-        filename = f"{filename_to_export}_{set_number + 1}"
+        filename = f"{filename_to_export}{set_number + 1}"
         
         # Define FE mesh and spacing method
         # process and output of meshed generated spheres
