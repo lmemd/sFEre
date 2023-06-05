@@ -8,8 +8,8 @@ from sieve_analysis_tools import sieve_analysis_evaluation as s
 def main():
     #**************************************INPUT SECTION******************************************
     filename_to_export = "S460_mixed_shots_70_90_No" # name of sphere file
-    spheres_number = 5 # total number of sphere created
-    spheres_batches = 14 # change this variable if you want to create more than one batch of shots
+    spheres_number = 15 # total number of sphere created
+    spheres_batches = 20 # change this variable if you want to create more than one batch of shots
     shots_material_density = 0.00785 #in gm/mm^3
     #nominal_velocity = 70 #in m/s
 
@@ -35,8 +35,8 @@ def main():
     element_length = 0.04
 
     # Define the domain characteristics (the space that contains the created spheres)
-    box_width = 2 # width of the domain containing the spheres (alongside X axis)
-    box_length = 2 # length of the domain containing the spheres (alongside Z axis)
+    box_width = 3 # width of the domain containing the spheres (alongside X axis)
+    box_length = 3 # length of the domain containing the spheres (alongside Z axis)
     box_height = 4 # height of the domain containing the spheres (alongside Y axis)
     box_angle = 90 # change this value if you want an inlcined box (defined by the angle between the box and the XZ plane)
 
@@ -70,7 +70,7 @@ def main():
         
         # Change the filename according to current index of set number
         filename = f"{filename_to_export}_{set_number + 1}"
-        
+        '''
         # Define FE mesh and spacing method
         # process and output of meshed generated spheres
         mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA-entities", pid = 1000000, renumbering_point=1000000)
@@ -81,14 +81,14 @@ def main():
         #applied_velocity = apply_initial_velocity(filename, nominal_velocity, velocity_stochasticity_approach, *velocity_params, angle = box_angle)
         velocity_params = (70, 70*0.05)
         applied_velocity = apply_initial_velocity(filename, 75, "Normal distribution", *velocity_params, angle = box_angle, pid=1000000)
-
+        '''
         #velocities_list.extend(applied_velocity)
         spheres_list.extend(spheres)
         print(set_number)
     
     # 3D plot of generated spheres        
     #stream.plot_spheres(spheres_list)
-    #stream.plot_coverage(spheres_list)
+    stream.plot_coverage(spheres_list)
 
     generated_diameters = [s.r*2 for s in spheres_list]
     

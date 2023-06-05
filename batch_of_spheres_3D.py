@@ -10,8 +10,8 @@ def main():
     filename_to_export = "S460_shots_75_90_No" # name of sphere file
     mean_radius = 1.4/2 # average radius of created sphere
     radius_std = 0.135/2 # standard deviation of radius for the created sphere
-    spheres_number = 4 # total number of sphere created
-    spheres_batches = 17 # change this variable if you want to create more than one batch of shots
+    spheres_number = 12 # total number of sphere created
+    spheres_batches = 1 # change this variable if you want to create more than one batch of shots
 
     # Define FE length for spheres
     element_length = 0.04
@@ -19,7 +19,7 @@ def main():
     # Define the domain characteristics (the space that contains the created spheres)
     box_width = 3 # width of the domain containing the spheres (alongside X axis)
     box_length = 3 # length of the domain containing the spheres (alongside Z axis)
-    box_height = 4 # height of the domain containing the spheres (alongside Y axis)
+    box_height = 7 # height of the domain containing the spheres (alongside Y axis)
     box_angle = 90 # change this value if you want an inlcined box (defined by the angle between the box and the XZ plane)
 
     parent_dir = os.getcwd()
