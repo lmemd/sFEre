@@ -101,7 +101,7 @@ class shot_stream:
             
             fitted_mixed_weibull, data = st.calculate_Weibull_parameters(bin_edges[:-1], number_of_shots)           
             fitted_distribution = dist.MixedWeibull(fitted_mixed_weibull.alpha_1, fitted_mixed_weibull.beta_1, fitted_mixed_weibull.alpha_2, fitted_mixed_weibull.beta_2, fitted_mixed_weibull.proportion_1)
-        print(fitted_distribution.__dict__)
+        #print(fitted_distribution.__dict__)
         return fitted_distribution
 
     def random_sphere_inside_box(self,r):
