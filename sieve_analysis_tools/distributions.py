@@ -130,3 +130,61 @@ class MixedWeibull:
             random_numbers_2 = weibull_2.rvs(size=size_2)
 
         return np.concatenate([random_numbers_1, random_numbers_2])
+    
+class Mixed_Gaussian:
+    def __init__(self, mean_1, stdev_1, scale_1, mean_2, stdev_2, scale_2):
+        """
+        Initializes a new Mixed_Gaussian object.
+
+        Parameters:
+        ----------
+        mean_1 : float
+            The mean of the first Gaussian distribution.
+        stdev_1 : float
+            The standard deviation of the first Gaussian distribution.
+        mean_2 : float
+            The mean of the second Gaussian distribution.
+        stdev_2 : float
+            The standard deviation of the second Gaussian distribution.
+        mix_proportion : float
+            The proportion of the first Gaussian distribution in the mixture.
+        """
+        self.mean_1 = mean_1
+        self.stdev_1 = stdev_1
+        self.scale_1 = scale_1
+        self.mean_2 = mean_2
+        self.stdev_2 = stdev_2
+        self.scale_2 = scale_2
+
+    def generate_random_numbers(self, size):
+        """
+        Generates random numbers based on a mixed Gaussian distribution.
+
+        Args:
+            num_samples (int): Number of random numbers to generate. Defaults to 1.
+
+        Returns:
+            list: A list of randomly generated numbers based on the mixed Gaussian distribution.
+        """
+        # Calculate the weights for the mixture
+        weight_1 = self.mix_proportion
+        weight_2 = 1 - self.mix_proportion
+
+        # Generate random numbers based on the mixed Gaussian distribution
+        samples = []
+        for _ in range(size):
+            # Randomly select a Gaussian distribution based on weights
+            gaussian_index = np.random.choices([0, 1], weights=[weight_1, weight_2], k=1)[0]
+
+            # Generate a random number from the selected Gaussian distribution
+            if gaussian_index == 0:
+                mu = self.mean_1
+                sigma = self.stdev_1
+            else:
+                mu = self.mean_2
+                sigma = self.stdev_2
+
+            sample = np.random.gauss(mu, sigma)
+            samples.append(sample)
+
+        return samples

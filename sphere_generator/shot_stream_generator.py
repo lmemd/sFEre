@@ -21,10 +21,7 @@ class shot_stream:
        box_offset_dists (tupple) : The distances for the stream to be offseted in space
        mean_radius (float) : The average radius of the shots
        radius_standard_deviation (float) : The standard deviation of the diameter
-       sieve_analysis_data (list(list,list)) : A list that contains two lists with the sieve diameters and the retained weight respectively
-       fitting_distribution (string): The distribution to fit to sieve analysis data. Only when sieve analysis data exists. Only works for "Gaussian" or "Mixed Weibull"
-       material _density (float): The density of the material of the shots given in gm/mm^3. Necessary to perform the sieve analysis and fit the distribution
-    """
+    """   
     
     number_of_spheres = 1
     problem_dimensions = 0
@@ -40,69 +37,33 @@ class shot_stream:
                 domain_dimensions_setter,
                 impact_angle_setter,
                 box_offset_dists_setter=(0,0,0),     
-                mean_radius_setter=None,
-                radius_standard_deviation_setter=None, 
-                sieve_analysis_data_setter=None,
-                fitting_distribution_setter = "Mixed Weibull",
-                material_density_setter = 0):
+                mean_radius_setter=mean_radius,
+                radius_standard_deviation_setter=radius_standard_deviation, 
+                ):
 
 
         """Initialize attributes with given values
         """
-        self.number_of_spheres = number_of_spheres_setter
         self.problem_dimensions = problem_dimensions_setter
         self.domain_dimensions = domain_dimensions_setter
         self.impact_angle = impact_angle_setter
         self.box_offset_dists = box_offset_dists_setter
         
-        if mean_radius_setter is not None and radius_standard_deviation_setter is not None:
+        if isinstance(mean_radius_setter, list):
             self.mean_radius = mean_radius_setter
-            self.radius_standard_deviation = radius_standard_deviation_setter
-            self.sieve_analysis_data = None
-            self.shot_material_density = None
-
-        elif sieve_analysis_data_setter is not None:
-            self.sieve_analysis_data = sieve_analysis_data_setter
-            self.shot_material_density = material_density_setter #in gm/mm^3
-            self.fitting_distribution = fitting_distribution_setter 
-            self.mean_radius = None
-            self.radius_standard_deviation = None
         else:
+            self.mean_radius = [mean_radius_setter]
 
-            raise ValueError("Either mean diameter and standard deviation or sieve analysis data must be provided.")
-    
-    def fit_sieve_distribution(self):
-        """
-        Fits either a normal distribution or a Weibull distribution to the given sieve data.
+        if isinstance(radius_standard_deviation_setter, list):
+            self.radius_standard_deviation = radius_standard_deviation_setter
+        else:
+            self.radius_standard_deviation = [radius_standard_deviation_setter]
         
-        Args:
-        sieve_data (np.ndarray): The data obtained from sieve analysis.
+        if isinstance(number_of_spheres_setter,list):
+            self.number_of_spheres = number_of_spheres_setter
+        else:
+            self.number_of_spheres = [number_of_spheres_setter]
 
-        Returns:
-        tuple: A tuple containing the parameters of the fitted distribution. If a normal distribution is fitted, the tuple
-            contains (mu, sigma); if a Weibull distribution is fitted, the tuple contains (alpha, beta).
-        """
-        sieve_levels = self.sieve_analysis_data[0]
-        retained_weight = self.sieve_analysis_data[1]
-        
-        bin_edges, weight_per_sieve = st.sort_data(sieve_levels, retained_weight)
-        bin_centers = st.calculate_bin_centers(bin_edges)  
-
-        number_of_shots = st.calculate_number_of_shots(bin_centers, weight_per_sieve,self.shot_material_density)
-
-        # Fit a Gaussian distribution
-        if self.fitting_distribution == "Gaussian":
-            
-            fitted_gaussian, data = st.calculate_Gaussian_parameters(bin_edges[:-1], number_of_shots)            
-            fitted_distribution = dist.GaussianDistribution(fitted_gaussian.mu, fitted_gaussian.sigma)
-        
-        # Otherwise, fit a Mixed Weibull distribution
-        elif self.fitting_distribution == "Mixed Weibull":       
-            
-            fitted_mixed_weibull, data = st.calculate_Weibull_parameters(bin_edges[:-1], number_of_shots)           
-            fitted_distribution = dist.MixedWeibull(fitted_mixed_weibull.alpha_1, fitted_mixed_weibull.beta_1, fitted_mixed_weibull.alpha_2, fitted_mixed_weibull.beta_2, fitted_mixed_weibull.proportion_1)
-        #print(fitted_distribution.__dict__)
-        return fitted_distribution
 
     def random_sphere_inside_box(self,r):
         """Creates a sphere, random positioned INSIDE the given box using a uniform distribution. Specifically the WHOLE sphere must lies 
@@ -177,47 +138,56 @@ class shot_stream:
         return spheres
 
     def generate(self):
-        """Generates a shot stream, according to given attributes. The spheres are not intersecting.
+        """Generates a shot stream according to the given attributes. The spheres are not allowed to intersect.
 
-        Returns:
-            list: A list of spheres
+            Returns:
+                list: A list of spheres
+
+            Raises:
+                AssertionError: If the lengths of `mean_radius`, `radius_standard_deviation`, and `number_of_spheres`
+                                do not match.
+
+            Notes:
+                The method generates spheres for each combination of mean radius, standard deviation, and number of spheres
+                specified in the respective attributes. The spheres are randomly created and allocated in space, following
+                the specified distribution parameters. The method checks for intersections with previously generated spheres
+                to ensure non-intersecting spheres are added to the shot stream. The process continues until the requested
+                number of spheres for each combination is achieved or the maximum number of loop iterations is reached.
+
+                The lengths of `mean_radius`, `radius_standard_deviation`, and `number_of_spheres` must match, indicating the
+                number of combinations to generate.
+
+                If the requested number of spheres cannot be achieved due to intersections, a warning message is printed,
+                and the actual number of created spheres is returned.
+
         """
         no_sphere_loops = 0 #total number of loops for each distribution. If they exceed a limit, the loop stops
-        spheres = []
-        custom_distribution_flag = False
-
-        #Check if sieve analysis data exist
-        if self.sieve_analysis_data is not None:
-            distribution = self.fit_sieve_distribution()
-            print(distribution,distribution.__dict__)
-            custom_distribution_flag = True
-        
+        spheres = []        
         #Loop for each shot
         #####################################################
-        while len(spheres) < self.number_of_spheres and no_sphere_loops <= 2e3:
-            
-            #create and allocate the sphere in space
-            #####################################################
-            
-            if custom_distribution_flag:
-                r = random.choice(distribution.generate_random_numbers(200)/2)
-                print(r)
-            else:
-                r = random.gauss(self.mean_radius,self.radius_standard_deviation)
-            s = self.random_sphere_inside_box(r)
-            
-            ######################################################
-            #spheres.append(s)
-            
-            #check if size criteria are satisfied
-            intersection = self.intersects_existing(s,spheres)
-            if not intersection:
-                spheres.append(s) #add the created sphere to the list
-                no_sphere_loops = 0 #zero-out the sphere loops iterator
-            else:
-                no_sphere_loops += 1
+        for m,std,no in zip(self.mean_radius,self.radius_standard_deviation,self.number_of_spheres):
+            spheres_counter = 0
+            while spheres_counter < no and no_sphere_loops <= 2e3:
+                
+                #create and allocate the sphere in space
+                #####################################################
+                
+                r = random.gauss(m,std)
+                s = self.random_sphere_inside_box(r)
+                
+                ######################################################
+                #spheres.append(s)
+                
+                #check if size criteria are satisfied
+                intersection = self.intersects_existing(s,spheres)
+                if not intersection:
+                    spheres_counter += 1
+                    spheres.append(s) #add the created sphere to the list
+                    no_sphere_loops = 0 #zero-out the sphere loops iterator
+                else:
+                    no_sphere_loops += 1
 
-        if self.number_of_spheres > len(spheres):
+        if sum(self.number_of_spheres) > len(spheres):
                 print("Requested number of spheres could not be achieved due to intersections, a total of " + str(len(spheres)) + " created instead.")
         
         return spheres

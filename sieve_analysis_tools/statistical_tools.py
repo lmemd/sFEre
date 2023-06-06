@@ -168,7 +168,7 @@ def calculate_Gaussian_parameters(bin_values, frequency):
     return results, all_data
 
 #Debuggin code
-
+'''
 def generate_sphere_from_sieve_analysis_data(sieves,retained_weight,distribution_fitting_method,shots_material_density,no_of_shots=1):
     
     bin_edges, weight_per_sieve = sort_data(sieves, retained_weight)
@@ -193,3 +193,4 @@ def generate_sphere_from_sieve_analysis_data(sieves,retained_weight,distribution
 
         
         return generated_data
+'''
