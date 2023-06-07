@@ -6,14 +6,15 @@ import os
 from sieve_analysis_tools import fitters
 from sieve_analysis_tools import sieve_analysis_evaluation as s
 import numpy as np
+from matplotlib import pyplot as plt
 
 def main():
     #**************************************INPUT SECTION******************************************
-    filename_to_export = "S460_shots_75_90_No" # name of sphere file
+    filename_to_export = "mixed_shots_75_90_No" # name of sphere file
     #mean_radius = [1.4/2, 0.5/2] # average radius of created sphere
     #radius_std = [0.135/2, 0.135/2] # standard deviation of radius for the created sphere
     #spheres_number = [1, 4] # total number of sphere created
-    spheres_batches = 10 # change this variable if you want to create more than one batch of shots
+    spheres_batches = 17 # change this variable if you want to create more than one batch of shots
     shots_material_density = 0.00785 #in gm/mm^3
 
     #Define the impact velocity configuration
@@ -42,7 +43,7 @@ def main():
     
     mean_radius = [mix_distribution.mean_1/2, mix_distribution.mean_2/2] # average radius of created sphere
     radius_std = [mix_distribution.stdev_1/2, mix_distribution.stdev_2/2] # standard deviation of radius for the created sphere
-    total_spheres = 100
+    total_spheres = 15
     
     proportion = mix_distribution.mix_proportion
     
@@ -51,9 +52,9 @@ def main():
     element_length = 0.04
 
     # Define the domain characteristics (the space that contains the created spheres)
-    box_width = 20 # width of the domain containing the spheres (alongside X axis)
-    box_length = 20 # length of the domain containing the spheres (alongside Z axis)
-    box_height = 40 # height of the domain containing the spheres (alongside Y axis)
+    box_width = 3 # width of the domain containing the spheres (alongside X axis)
+    box_length = 3 # length of the domain containing the spheres (alongside Z axis)
+    box_height = 7 # height of the domain containing the spheres (alongside Y axis)
     box_angle = 90 # change this value if you want an inlcined box (defined by the angle between the box and the XZ plane)
 
     #define the directory
@@ -85,26 +86,26 @@ def main():
         
         # Change the filename according to current index of set number
         filename = f"{filename_to_export}_{set_number + 1}"
-        '''
+        
         # Define FE mesh and spacing method
         # process and output of meshed generated spheres
         mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA-entities", pid = 1000000, renumbering_point=1000000)
 
         # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
-        # Currently, an absolute initial veloc
-        ity of 70 m/s will be applied.
+        # Currently, an absolute initial velocity of 70 m/s will be applied.
 
         #applied_velocity = apply_initial_velocity(filename, nominal_velocity, velocity_stochasticity_approach, *velocity_params, angle = box_angle)
         velocity_params = (70, 70*0.05)
         applied_velocity = apply_initial_velocity(filename, 75, "Normal distribution", *velocity_params, angle = box_angle, pid=1000000)
-        '''
-        #velocities_list.extend(applied_velocity)
+        
+        velocities_list.append(applied_velocity)
+
         spheres_list.extend(spheres)
     
     # 3D plot of generated spheres        
     #stream.plot_spheres(spheres_list)
-    #stream.plot_coverage(spheres_list)
-
+    stream.plot_coverage(spheres_list,70)
+    plt.hist(velocities_list)
     generated_diameters = [s.r*2 for s in spheres_list]
     
     s.sieve_analysis(generated_diameters, retained_weight, sieve_levels,shots_material_density)

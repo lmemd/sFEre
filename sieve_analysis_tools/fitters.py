@@ -8,9 +8,6 @@ import sieve_analysis_tools.distributions as dist
 from scipy.optimize import curve_fit
 from scipy.signal import find_peaks
 
-
-
-
 def fit_weibull_mixture(failures):
     """
     Fits a Weibull mixture distribution to the data.
