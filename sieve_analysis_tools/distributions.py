@@ -132,7 +132,7 @@ class MixedWeibull:
         return np.concatenate([random_numbers_1, random_numbers_2])
     
 class Mixed_Gaussian:
-    def __init__(self, mean_1, stdev_1, scale_1, mean_2, stdev_2, scale_2):
+    def __init__(self, mean_1, stdev_1, mean_2, stdev_2, mix_proportion):
         """
         Initializes a new Mixed_Gaussian object.
 
@@ -151,10 +151,9 @@ class Mixed_Gaussian:
         """
         self.mean_1 = mean_1
         self.stdev_1 = stdev_1
-        self.scale_1 = scale_1
         self.mean_2 = mean_2
         self.stdev_2 = stdev_2
-        self.scale_2 = scale_2
+        self.mix_proportion = mix_proportion
 
     def generate_random_numbers(self, size):
         """
