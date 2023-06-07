@@ -221,13 +221,14 @@ class shot_stream:
         """
         box = self.domain_dimensions
         if box.dim_z != 0:
-              
+            shots = []  
             for sph in spheres:
                 #dent = 2*sph.r*(0.4/1.18)
                 dent = (2*sph.r)*(0.075*nominal_velocity**0.45)
                 circle = plt.Circle((sph.x, sph.z), dent/2 , edgecolor = 'black', facecolor = 'red', alpha = 0.08)
                 plt.gca().add_patch(circle)
-
+                shots.append((sph.x,sph.z,float(dent/2)))
+            calculate_impact_percentage(box.dim_x, box.dim_z, 0.001, shots)
             plt.gca().set_xlim((-box.dim_x/2, box.dim_x/2))
             plt.gca().set_ylim((-box.dim_z/2, box.dim_z/2))
             
@@ -237,11 +238,12 @@ class shot_stream:
             
             plt.title("Coverage")
             plt.show()
-        
+
         elif box.dim_z == 0:
             print('Coverage plot is only available in 3D spheres')
             return
-    
+        
+
     def plot_spheres(self,spheres):
         """Plots the generated spheres, in space or in plane.
 
@@ -321,4 +323,75 @@ class shot_stream:
             return total_volume/(box.dim_x*box.dim_y)  
         else:
             return total_volume/(box.dim_x*box.dim_y*box.dim_z)
+
+def calculate_impact_percentage(surface_width, surface_height, resolution, shots):
+    # Calculate the number of cells in each dimension based on the resolution
+    num_cells_width = int(surface_width / resolution)
+    num_cells_height = int(surface_height / resolution)
+
+    # Initialize a grid representing the surface area
+    surface = [[False] * num_cells_height for _ in range(num_cells_width)]
+
+    # Perform the simulation for each shot
+    for shot in shots:
+        x, y, impact_radius = shot
+
+        # Convert the shot coordinates and impact radius to the cell indices
+        x_index = int(x / resolution)
+        y_index = int(y / resolution)
+        impact_radius_cells = int(impact_radius / resolution)
+
+        # Check if the shot falls within the circular impact region
+        for i in range(x_index - impact_radius_cells, x_index + impact_radius_cells + 1):
+            for j in range(y_index - impact_radius_cells, y_index + impact_radius_cells + 1):
+                if 0 <= i < num_cells_width and 0 <= j < num_cells_height:
+                    if math.sqrt((x_index - i) ** 2 + (y_index - j) ** 2) <= impact_radius_cells:
+                        surface[i][j] = True
+
+    # Calculate the percentage of the area impacted by shots
+    total_impacted_area = sum(sum(row) for row in surface)
+    total_area = num_cells_width * num_cells_height
+    impact_percentage = (total_impacted_area / total_area) * 100
+
+    # Calculate the percentage of the area impacted more than once
+    multiple_impact_count = sum(1 for row in surface for count in row if count > 1)
+    multiple_impact_percentage = (multiple_impact_count / total_area) * 100
+    print(f"Percentage of area impacted: {impact_percentage:.2f}%")
+    print(f"Percentage of area impacted more than once: {multiple_impact_percentage:.2f}%")
+    return impact_percentage, multiple_impact_percentage
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
