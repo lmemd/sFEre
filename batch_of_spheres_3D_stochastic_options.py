@@ -5,6 +5,7 @@ from sphere_generator.utilities import *
 import os
 from sieve_analysis_tools import fitters
 from sieve_analysis_tools import sieve_analysis_evaluation as s
+import numpy as np
 
 def main():
     #**************************************INPUT SECTION******************************************
@@ -31,23 +32,21 @@ def main():
     # Input for sphere generation based on measured sieve analysis data
     sieve_levels = [2., 1.6, 1.4, 1.25, 1.12, 1., 0.9, 0.8, 0.71, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.]
     retained_weight = [0.0, 0.1, 2.4, 46.3, 42.4, 24.8, 5.6, 5.3, 5.3, 8.8, 9.7, 7.1, 1.7, 0.2, 0.1, 0.0]
-    sieve_analysis_data = [sieve_levels , retained_weight]
 
+    #Standard sieve analysis data for S460 Shots
+    #sieve_levels = [2., 1.7, 1.18, 1.]
+    #retained_weight = [0.0, 5, 84, 11]
+
+    sieve_analysis_data = [sieve_levels , retained_weight]
     mix_distribution = fitters.fit_sieve_distribution(sieve_analysis_data,shots_material_density,'Mixed Gaussian')
-    
     
     mean_radius = [mix_distribution.mean_1/2, mix_distribution.mean_2/2] # average radius of created sphere
     radius_std = [mix_distribution.stdev_1/2, mix_distribution.stdev_2/2] # standard deviation of radius for the created sphere
     total_spheres = 100
     
-    scale_factors_sum = mix_distribution.scale_1 + mix_distribution.scale_2
-    p1_norm = mix_distribution.scale_1 / scale_factors_sum
-    p2_norm = mix_distribution.scale_2 / scale_factors_sum
-    print(p1_norm,p2_norm)
+    proportion = mix_distribution.mix_proportion
     
-    
-    spheres_number = [int(total_spheres*p1_norm), int(total_spheres*p2_norm)] # total number of sphere created
-    print(spheres_number)
+    spheres_number = [int(total_spheres*proportion), int(total_spheres*(1-proportion))] # total number of sphere created
     # Define FE length for spheres
     element_length = 0.04
 
@@ -92,7 +91,8 @@ def main():
         mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA-entities", pid = 1000000, renumbering_point=1000000)
 
         # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
-        # Currently, an absolute initial velocity of 70 m/s will be applied.
+        # Currently, an absolute initial veloc
+        ity of 70 m/s will be applied.
 
         #applied_velocity = apply_initial_velocity(filename, nominal_velocity, velocity_stochasticity_approach, *velocity_params, angle = box_angle)
         velocity_params = (70, 70*0.05)
@@ -100,19 +100,19 @@ def main():
         '''
         #velocities_list.extend(applied_velocity)
         spheres_list.extend(spheres)
-        print(set_number)
     
     # 3D plot of generated spheres        
     #stream.plot_spheres(spheres_list)
-    stream.plot_coverage(spheres_list)
+    #stream.plot_coverage(spheres_list)
 
     generated_diameters = [s.r*2 for s in spheres_list]
     
-    s.evaluate(sieve_levels, retained_weight, generated_diameters, shots_material_density)
+    s.sieve_analysis(generated_diameters, retained_weight, sieve_levels,shots_material_density)
 
     # Print the X,Y coordinates and the radii of created spheres
     list_to_print = ['%.4f'%s.x + '    ' +  '%.4f'%s.y + '   ' +  '%.4f'%s.z + '    ' +  '%.4f'%s.r for s in spheres]
     list_to_print.insert(0,'X coord    Y coord    Z coord    Radius')
+    
     print(*list_to_print, sep='\n')
 
 if __name__ == "__main__":
