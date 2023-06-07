@@ -86,7 +86,7 @@ def main():
         
         # Change the filename according to current index of set number
         filename = f"{filename_to_export}_{set_number + 1}"
-        
+        '''
         # Define FE mesh and spacing method
         # process and output of meshed generated spheres
         mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA-entities", pid = 1000000, renumbering_point=1000000)
@@ -99,7 +99,7 @@ def main():
         applied_velocity = apply_initial_velocity(filename, 75, "Normal distribution", *velocity_params, angle = box_angle, pid=1000000)
         
         velocities_list.append(applied_velocity)
-
+        '''
         spheres_list.extend(spheres)
     
     # 3D plot of generated spheres        
