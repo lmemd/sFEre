@@ -211,7 +211,7 @@ class shot_stream:
 
         return False
 
-    def plot_coverage(self,spheres):
+    def plot_coverage(self,spheres,nominal_velocity):
         """Plots the spot marks of the shot impact, in the area of interest. Only works for vertical shot stream.
            The radius of each spot mark is calculated as the 34% of the sphere diameter. For example a sphere with
            a diameter of 1.2 mm, will leave a spot mark with radius 0.41 mm.
@@ -221,10 +221,10 @@ class shot_stream:
         """
         box = self.domain_dimensions
         if box.dim_z != 0:
-
+              
             for sph in spheres:
-                dent = 2*sph.r*(0.4/1.18)
-
+                #dent = 2*sph.r*(0.4/1.18)
+                dent = (2*sph.r)*(0.075*nominal_velocity**0.45)
                 circle = plt.Circle((sph.x, sph.z), dent/2 , edgecolor = 'black', facecolor = 'red', alpha = 0.08)
                 plt.gca().add_patch(circle)
 
