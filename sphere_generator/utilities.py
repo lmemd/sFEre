@@ -1,4 +1,6 @@
 from .box import box_2D,box_3D
+import numpy as np
+from matplotlib import pyplot as plt
 
 def problem_dimensions_setter(dimensions):
     """Sets the problem dimensions, they may be 2 or 3
@@ -45,3 +47,72 @@ def box_getter(integer_dimensions, box_width, box_height, box_length = None):
         return box_2D(box_width,box_height)
     else:
         raise Exception('Problem dimensions must be integer')
+    
+def impigment_diameter_calculation(radius,velocity):
+    """
+    Calculate the diameter of an impigment (dent) on a surface caused by an object.
+
+    Parameters:
+        radius (float): Radius of the object.
+        velocity (float): Velocity of the object.
+
+    Returns:
+        float: Diameter of the impigment (dent).
+    """
+    dent = (2*radius)*(0.075*velocity**0.45)
+    return dent
+    
+def covered_area(circle_centers,dents,surface_width, surface_height,resolution):
+
+    """
+    Calculate the percentage of the points in the covered area of a surface.
+
+    Parameters:
+        circle_centers (list): List of (x, y) coordinates representing the centers of the circles.
+        dents (list): List of dent (impigment) radii corresponding to each circle.
+        surface_dimensions (float): Dimensions of the surface.
+        resolution (float): Grid resolution for dividing the surface.
+
+    Returns:
+        list: List of percentages representing the coverage of the surface for each threshold value.
+    """
+    grid_size_width = int(surface_width / resolution)
+    grid_size_height = int(surface_height / resolution)
+    grid_points_width = np.linspace(-surface_width/2, surface_width/2, grid_size_width)
+    grid_points_height = np.linspace(-surface_height/2, surface_height/2, grid_size_height)
+
+    # Create the grid and the 2D array
+    X, Y = np.meshgrid(grid_points_width, grid_points_height)
+    grid_array = np.zeros((grid_size_height, grid_size_width))
+
+    # Iterate over each grid point
+    for i in range(grid_size_height):
+        for j in range(grid_size_width):
+            x = X[i, j]
+            y = Y[i, j]
+            
+            # Check if the point lies within any of the circles
+            for k, center in enumerate(circle_centers):
+                radius = dents[k]
+                if np.sqrt((x - center[0])**2 + (y - center[1])**2) <= radius:
+                    grid_array[i, j] += 1
+
+    thresholds = [1, 2, 3, 4, 5, 6]  # Threshold values
+
+    percentage_values = []  # List to store the percentages
+
+    # Iterate over each threshold
+    for threshold in thresholds:
+        count = np.count_nonzero(grid_array > threshold)  # Count the points above the threshold
+        percentage = count / grid_array.size * 100  # Calculate the percentage
+        percentage_values.append(percentage)  # Add the percentage to the list
+
+    # Print the percentages
+    for i, threshold in enumerate(thresholds):
+        print(f"Percentage of points over {threshold}: {percentage_values[i]:.2f}%")
+    
+    return percentage_values
+    #plt.imshow(grid_array, cmap='hot', origin='lower')
+    # Add colorbar
+    #plt.colorbar()
+

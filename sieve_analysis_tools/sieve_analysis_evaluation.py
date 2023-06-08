@@ -53,7 +53,7 @@ def sieve_analysis(generated_spheres, measured_weight, inverse_sieve_sizes, rho)
     #plt.plot(sieve_levels, number_of_shots_per_sieve)
     #plt.gca().invert_xaxis()
 
-    plt.figure(2)
+    plt.figure()
     plt.plot(sieve_levels, generated_retained_mass_final, 'o-', color='tab:red')
     plt.plot(sieve_levels, measured_weight_final, 'o-', color='tab:blue')
 
@@ -66,4 +66,4 @@ def sieve_analysis(generated_spheres, measured_weight, inverse_sieve_sizes, rho)
     plt.xlabel('Sieve size (mm)')
     plt.ylabel('Weight (%)')
     plt.grid()
-    plt.show()
+    

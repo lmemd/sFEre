@@ -193,6 +193,8 @@ def apply_initial_velocity(filename, user_initial_velocity, velocity_stochastici
         
         #feature for application of stochastic velocity to the stream added
         if velocity_stochasticity_option == "Normal distribution":
+            if user_initial_velocity != stochasticity_args[0]:
+                print('WARNING: Requested velocity of ' + str(user_initial_velocity) + ' m/s do not match with the input average velocity of ' + str(stochasticity_args[0]) + ' m/s. \n' + str(stochasticity_args[0]) + ' m/s will be used instead as nominal-average velocity.')
             user_initial_velocity = vs.normally_distributed_velocity(*stochasticity_args)[0]
             print("applied velocity: ", user_initial_velocity)
         

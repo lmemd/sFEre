@@ -41,13 +41,17 @@ def main():
     sieve_analysis_data = [sieve_levels , retained_weight]
     mix_distribution = fitters.fit_sieve_distribution(sieve_analysis_data,shots_material_density,'Mixed Gaussian')
     
+    #mean_radius = mix_distribution.mean/2
+    #radius_std = mix_distribution.stdev/2
+
     mean_radius = [mix_distribution.mean_1/2, mix_distribution.mean_2/2] # average radius of created sphere
     radius_std = [mix_distribution.stdev_1/2, mix_distribution.stdev_2/2] # standard deviation of radius for the created sphere
-    total_spheres = 15
+    total_spheres = 18
     
     proportion = mix_distribution.mix_proportion
     
     spheres_number = [int(total_spheres*proportion), int(total_spheres*(1-proportion))] # total number of sphere created
+    #spheres_number = total_spheres
     # Define FE length for spheres
     element_length = 0.04
 
@@ -70,7 +74,7 @@ def main():
     box = box_getter(problem_dimensions,box_width,box_height,box_length) # create the box 
 
     #***********************************END OF INPUT SECTION**************************************
-
+    coverage_list = []
     spheres_list = [] # initialize empty spheres list
     velocities_list = [] # initialize empty applied velocities list
     for set_number in range(spheres_batches):
@@ -86,7 +90,7 @@ def main():
         
         # Change the filename according to current index of set number
         filename = f"{filename_to_export}_{set_number + 1}"
-        '''
+        
         # Define FE mesh and spacing method
         # process and output of meshed generated spheres
         mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA-entities", pid = 1000000, renumbering_point=1000000)
@@ -99,15 +103,31 @@ def main():
         applied_velocity = apply_initial_velocity(filename, 75, "Normal distribution", *velocity_params, angle = box_angle, pid=1000000)
         
         velocities_list.append(applied_velocity)
-        '''
         spheres_list.extend(spheres)
+        
+        #Calculate percentage of coverage
+        shot_dents = [impigment_diameter_calculation(sph.r,70)/2 for sph in spheres_list]
+        centers = [(sph.x , sph.z) for sph in spheres_list]
+        coverage = stream.calculate_coverage(centers,shot_dents,0.01)
+        coverage_list.append(coverage)
+
+    plt.figure()
+
+    transposed_data = np.transpose(coverage_list)
+    for i, item_group in enumerate(transposed_data):
+        plt.plot(item_group, label='Item {}'.format(i + 1))
+
+    #2D Plot of the covered area
+    stream.plot_coverage(spheres_list,70)
     
+    #Plot distribution of velocities
+    plt.hist(velocities_list)
+
     # 3D plot of generated spheres        
     #stream.plot_spheres(spheres_list)
-    stream.plot_coverage(spheres_list,70)
-    plt.hist(velocities_list)
-    generated_diameters = [s.r*2 for s in spheres_list]
     
+    #Perform a sieve analysis and plot size distributions
+    generated_diameters = [s.r*2 for s in spheres_list]
     s.sieve_analysis(generated_diameters, retained_weight, sieve_levels,shots_material_density)
 
     # Print the X,Y coordinates and the radii of created spheres
@@ -115,7 +135,7 @@ def main():
     list_to_print.insert(0,'X coord    Y coord    Z coord    Radius')
     
     print(*list_to_print, sep='\n')
-
+    plt.show()
 if __name__ == "__main__":
     main()
 
