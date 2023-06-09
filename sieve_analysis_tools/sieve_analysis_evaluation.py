@@ -45,8 +45,8 @@ def sieve_analysis(generated_spheres, measured_weight, inverse_sieve_sizes, rho)
     measured_weight_final = st.normalize_frequency(measured_weight[::-1])
 
     # Calculate cumulative frequencies of the generated retained mass and measured weight
-    cumulative_generated_retained_mass = st.calculate_cumulative_frequencies(generated_retained_mass_final)[::-1]
-    cumulative_measured_weight = st.calculate_cumulative_frequencies(measured_weight_final)[::-1]
+    cumulative_generated_retained_mass = st.calculate_cumulative_frequencies(generated_retained_mass_final)
+    cumulative_measured_weight = st.calculate_cumulative_frequencies(measured_weight_final)
 
     # Plot the results
     #plt.figure(1)

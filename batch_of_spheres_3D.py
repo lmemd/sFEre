@@ -14,6 +14,7 @@ def main():
     spheres_batches = 1 # change this variable if you want to create more than one batch of shots
 
     # Define FE length for spheres
+    
     element_length = 0.04
 
     # Define the domain characteristics (the space that contains the created spheres)
