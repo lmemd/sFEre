@@ -5,10 +5,10 @@
 # Except:
 !.gitignore
 
-!*.py         # all python files in root dir
+#!*.py         # all python files in root dir
 !FE_mesh/*.py # all python files in subdirs 
 !sphere_generator/*.py 
-#!sieve_analysis_tools/*.py
+!sieve_analysis_tools/*.py
 
 !LICENSE.md
 !README.md

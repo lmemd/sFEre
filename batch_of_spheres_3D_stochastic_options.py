@@ -50,7 +50,7 @@ def main():
     
     #mean_radius = [mix_distribution.mean_1/2, mix_distribution.mean_2/2] # average radius of created sphere
     #radius_std = [mix_distribution.stdev_1/2, mix_distribution.stdev_2/2] # standard deviation of radius for the created sphere
-    total_spheres = 18
+    total_spheres = 1
     
     #proportion = mix_distribution.mix_proportion
     
@@ -97,14 +97,14 @@ def main():
         
         # Define FE mesh and spacing method
         # process and output of meshed generated spheres
-        #mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA-entities", pid = 1000000, renumbering_point=1000000)
+        mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA-entities", pid = 1000000, renumbering_point=1000000)
 
         # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
         # Currently, an absolute initial velocity of 70 m/s will be applied.
 
         #applied_velocity = apply_initial_velocity(filename, nominal_velocity, velocity_stochasticity_approach, *velocity_params, angle = box_angle)
-        #velocity_params = (70, 70*0.05)
-        #applied_velocity = apply_initial_velocity(filename, 75, "Normal distribution", *velocity_params, angle = box_angle, pid=1000000)
+        velocity_params = (70, 70*0.05)
+        applied_velocity = apply_initial_velocity(filename, 75, "Normal distribution", *velocity_params, angle = box_angle, pid=1000000)
         
         #velocities_list.append(applied_velocity)
         spheres_list.extend(spheres)
