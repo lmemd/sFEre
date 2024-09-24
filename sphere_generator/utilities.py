@@ -48,28 +48,39 @@ def box_getter(integer_dimensions, box_width, box_height, box_length = None):
     else:
         raise Exception('Problem dimensions must be integer')
     
-def impigment_diameter_calculation(radius,velocity):
+def impigment_diameter_calculation(radius,velocity=None):
     """
     Calculate the diameter of an impigment (dent) on a surface caused by an object.
 
     Parameters:
         radius (float): Radius of the object.
-        velocity (float): Velocity of the object.
+        velocity (float, optional): Velocity of the object.
 
     Returns:
         float: Diameter of the impigment (dent).
     """
-    dent = (2*radius)*(0.075*velocity**0.45)
-    return dent
+    if isinstance(velocity, float) or isinstance(velocity, int):
+        rho = 0.00000000783 #tonne/mm^3 density of steel, only for steel shots
+        P = 0.2 # Coefficient of energy loss by the impact
+        HB = 509 #N/mm^3 Brinell hardness of the shots, in MPa
+        D = 2*radius #diameter of the sphere
+        v = velocity*1000 #convert velocity from m/s to mm/s
+       
+        return 1.278 * D * (P**0.25) * (rho**0.25) * (v**0.5) / (HB**0.25)
     
-def covered_area(circle_centers,dents,surface_width, surface_height,resolution):
+    else: 
+        #approximation that is independent of velocity. Applied only to steel shots, for velocites ranged between 40 and 80 m/s
+        return 0.41 * 2 * radius
+
+    
+def covered_area(circle_centers,dents_radii,surface_width, surface_height,resolution):
 
     """
     Calculate the percentage of the points in the covered area of a surface.
 
     Parameters:
         circle_centers (list): List of (x, y) coordinates representing the centers of the circles.
-        dents (list): List of dent (impigment) radii corresponding to each circle.
+        dents_radii (list): List of dent (impigment) radii corresponding to each circle.
         surface_dimensions (float): Dimensions of the surface.
         resolution (float): Grid resolution for dividing the surface.
 
@@ -93,17 +104,17 @@ def covered_area(circle_centers,dents,surface_width, surface_height,resolution):
             
             # Check if the point lies within any of the circles
             for k, center in enumerate(circle_centers):
-                radius = dents[k]
+                radius = dents_radii[k]
                 if np.sqrt((x - center[0])**2 + (y - center[1])**2) <= radius:
                     grid_array[i, j] += 1
 
-    thresholds = [1, 2, 3, 4, 5, 6]  # Threshold values
+    thresholds = [ 1, 2, 3, 4, 5, 6]  # Threshold values
 
     percentage_values = []  # List to store the percentages
 
     # Iterate over each threshold
     for threshold in thresholds:
-        count = np.count_nonzero(grid_array > threshold)  # Count the points above the threshold
+        count = np.count_nonzero(grid_array >= threshold)  # Count the points above the threshold
         percentage = count / grid_array.size * 100  # Calculate the percentage
         percentage_values.append(percentage)  # Add the percentage to the list
 
