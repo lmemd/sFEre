@@ -14,7 +14,7 @@ def main():
     #mean_radius = [1.4/2, 0.5/2] # average radius of created sphere
     #radius_std = [0.135/2, 0.135/2] # standard deviation of radius for the created sphere
     #spheres_number = [1, 4] # total number of sphere created
-    spheres_batches = 100 # change this variable if you want to create more than one batch of shots
+    spheres_batches = 10 # change this variable if you want to create more than one batch of shots
     shots_material_density = 0.00785 #in gm/mm^3
 
     #Define the impact velocity configuration
@@ -32,7 +32,7 @@ def main():
     
     # Input for sphere generation based on measured sieve analysis data
     sieve_levels = [2., 1.6, 1.4, 1.25, 1.12, 1., 0.9, 0.8, 0.71, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.]
-    retained_weight = [0.0, 0.1, 2.4, 46.3, 42.4, 24.8, 5.6, 5.3, 5.3, 8.8, 9.7, 7.1, 1.7, 0.2, 0.1, 0.0]
+    retained_weight = [0.0, 0.1, 2.4, 46.3, 42.4, 24.8, 5.6, 5.3, 5.3, 8.8, 9.7, 7.1, 1.7, 0.2, 0.1, 0.0] 
 
     #Standard sieve analysis data for S460 Shots
     #sieve_levels = [2., 1.7, 1.18, 1.]
