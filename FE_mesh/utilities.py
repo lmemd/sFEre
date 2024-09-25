@@ -4,11 +4,12 @@ import matplotlib.pyplot as plt
 
 def working_directory(path):   
     if not os.path.exists(path):
-         os.mkdir(path)   
+        os.mkdir(path)   
+    
     os.chdir(path)
 
 
-def merge_txt_files(filenames_list, final_output_filename, delete_temp = False, working_path = os.getcwd()):
+def merge_txt_files(filenames_list, final_output_filename, delete_temp = False):
     """This function merges txt files including initial velocity, 
     property and material.
 

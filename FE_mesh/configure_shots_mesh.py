@@ -15,6 +15,7 @@ def mesh_interface(mesh_method, spacing_method, spheres, element_length, filenam
         spheres (list): List of initialized spheres.
         element_length (float): FE mesh element length.
         filename (str): Name of the batch file.
+        output_path (str) : The name of the output path
         pid (int): PID.
         renumbering_point (int): Renumbering point of the .k file entities.
         initial_velocity (boolean or int/float): Initial velocity of generated spheres.

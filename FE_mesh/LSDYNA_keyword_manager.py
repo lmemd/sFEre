@@ -74,10 +74,12 @@ def output_keyword_file(nodes_s, elements_s, pid, filename, velocity = [], angle
         elements_s (array): Elements matrix.
         pid (int): Described before.
         filename (string): Final output name.
+        output_path (string): The final output directory
         velocity (float): Initial velocity of spheres.
         angle (float): Impact angle.
     """
     change_path = os.getcwd()
+    os.chdir(change_path)
     os.chdir(change_path)
 
     # creating txt files (NEEDS TO BE FIXED)
@@ -102,8 +104,6 @@ def output_keyword_file(nodes_s, elements_s, pid, filename, velocity = [], angle
     os.remove('material.txt')
     os.remove('initial_velocity.txt')
 
-    #changing path in order to produce multiple batches
-    os.chdir(change_path)
 
 
 def output_include_file(nodes_s, elements_s, pid, filename, velocity = [], angle = []):
@@ -119,6 +119,7 @@ def output_include_file(nodes_s, elements_s, pid, filename, velocity = [], angle
         angle (float): Impact angle.
     """
     change_path = os.getcwd()
+    os.chdir(change_path)
     os.chdir(change_path)
 
     # creating txt files (NEEDS TO BE FIXED)
@@ -148,6 +149,7 @@ def output_general_file(nodes_s, elements_s, filename, ending = ".txt"):
         ending (string): Default's '.txt'. Filename's ending.
     """
     change_path = os.getcwd()
+    os.chdir(change_path)
     os.chdir(change_path)
 
     # creating txt files (NEEDS TO BE FIXED)

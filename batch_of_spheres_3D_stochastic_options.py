@@ -14,7 +14,7 @@ def main():
     #mean_radius = [1.4/2, 0.5/2] # average radius of created sphere
     #radius_std = [0.135/2, 0.135/2] # standard deviation of radius for the created sphere
     #spheres_number = [1, 4] # total number of sphere created
-    spheres_batches = 1 # change this variable if you want to create more than one batch of shots
+    spheres_batches = 100 # change this variable if you want to create more than one batch of shots
     shots_material_density = 0.00785 #in gm/mm^3
 
     #Define the impact velocity configuration
@@ -31,30 +31,30 @@ def main():
     #                   velocity_range, percentage_of_retainment)
     
     # Input for sphere generation based on measured sieve analysis data
-    #sieve_levels = [2., 1.6, 1.4, 1.25, 1.12, 1., 0.9, 0.8, 0.71, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.]
-    #retained_weight = [0.0, 0.1, 2.4, 46.3, 42.4, 24.8, 5.6, 5.3, 5.3, 8.8, 9.7, 7.1, 1.7, 0.2, 0.1, 0.0]
+    sieve_levels = [2., 1.6, 1.4, 1.25, 1.12, 1., 0.9, 0.8, 0.71, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.]
+    retained_weight = [0.0, 0.1, 2.4, 46.3, 42.4, 24.8, 5.6, 5.3, 5.3, 8.8, 9.7, 7.1, 1.7, 0.2, 0.1, 0.0]
 
     #Standard sieve analysis data for S460 Shots
-    sieve_levels = [2., 1.7, 1.18, 1.]
-    retained_weight = [0.0, 5, 84, 11]
+    #sieve_levels = [2., 1.7, 1.18, 1.]
+    #retained_weight = [0.0, 5, 84, 11]
 
     sieve_analysis_data = [sieve_levels , retained_weight]
-    #mix_distribution = fitters.fit_sieve_distribution(sieve_analysis_data,shots_material_density,'Mixed Gaussian')
-    
+    mix_distribution = fitters.fit_sieve_distribution(sieve_analysis_data,shots_material_density,'Mixed Gaussian')
+    print(mix_distribution)
     #mean_radius = mix_distribution.mean/2
     #radius_std = mix_distribution.stdev/2
 
-    mean_radius = 1.4/2
-    radius_std = 0.135/2
+    #mean_radius = 1.4/2
+    #radius_std = 0.135/2
 
     
-    #mean_radius = [mix_distribution.mean_1/2, mix_distribution.mean_2/2] # average radius of created sphere
-    #radius_std = [mix_distribution.stdev_1/2, mix_distribution.stdev_2/2] # standard deviation of radius for the created sphere
-    total_spheres = 18
+    mean_radius = [mix_distribution.mean_1/2, mix_distribution.mean_2/2] # average radius of created sphere
+    radius_std = [mix_distribution.stdev_1/2, mix_distribution.stdev_2/2] # standard deviation of radius for the created sphere
+    total_spheres = 10
     
-    #proportion = mix_distribution.mix_proportion
+    proportion = mix_distribution.mix_proportion
     
-    #spheres_number = [int(total_spheres*proportion), int(total_spheres*(1-proportion))] # total number of sphere created
+    spheres_number = [int(total_spheres*proportion), int(total_spheres*(1-proportion))] # total number of sphere created
     spheres_number = total_spheres
     # Define FE length for spheres
     element_length = 0.04
@@ -97,7 +97,7 @@ def main():
         
         # Define FE mesh and spacing method
         # process and output of meshed generated spheres
-        #mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA-entities", pid = 1000000, renumbering_point=1000000)
+       # mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA-entities", pid = 1000000, renumbering_point=1000000)
 
         # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
         # Currently, an absolute initial velocity of 70 m/s will be applied.
@@ -115,7 +115,7 @@ def main():
         coverage = stream.calculate_coverage(centers,shot_dents,0.01)
         coverage_list.append(coverage)
 
-    plt.figure()
+    #plt.figure()
 
     transposed_data = np.transpose(coverage_list)
     for i, item_group in enumerate(transposed_data):

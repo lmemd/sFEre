@@ -243,7 +243,7 @@ def spacing(method, half_length, no_of_elements, scale_factor, transverse_no_of_
                              np.reshape(spacing_y, (np.shape(spacing_y)[0], 1)),
                              np.reshape(spacing_z, (np.shape(spacing_z)[0], 1))))
 
-    grid_all = np.zeros((1, 3))
+    grid_all = np.zeros((1, np.shape(inner)[1]))
 
     # Calling spacing method to obtain spacing values for layer elements
     j = spacing_method(spacing_method_input, transverse_no_of_elements, spacing_factor)
@@ -365,7 +365,7 @@ def renumbering_element_pairs(old_nodes_id, sorted_nodes_id, elements_matrix):
         ndarray : Mapped elements matrix.
     """
     mapping = dict(zip(old_nodes_id, sorted_nodes_id))
-    elements_matrix = npi.remap(elements_matrix.flatten(), list(mapping.keys()), list(mapping.values())).reshape(np.shape(elements_matrix)[0], 8)
+    elements_matrix = npi.remap(elements_matrix.flatten(), list(mapping.keys()), list(mapping.values())).reshape(np.shape(elements_matrix)[0], np.shape(elements_matrix)[1])
 
     return elements_matrix
 

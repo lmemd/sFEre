@@ -211,7 +211,7 @@ class shot_stream:
 
         return False
 
-    def plot_coverage(self,spheres,nominal_velocity):
+    def plot_coverage(self,spheres,nominal_velocity=None):
         """Plots the spot marks of the shot impact, in the area of interest. Only works for vertical shot stream.
            The radius of each spot mark is calculated as the 34% of the sphere diameter. For example a sphere with
            a diameter of 1.2 mm, will leave a spot mark with radius 0.41 mm.
@@ -225,8 +225,9 @@ class shot_stream:
         if box.dim_z != 0:
             shots = []  
             for sph in spheres:
+                
                 dent = impigment_diameter_calculation(sph.r,nominal_velocity) 
-                #(2*sph.r)*(0.075*nominal_velocity**0.45)
+                
                 circle = plt.Circle((sph.x, sph.z), dent/2 , edgecolor = 'black', facecolor = 'red', alpha = 0.08)
                 plt.gca().add_patch(circle)
                 shots.append((sph.x, sph.z, dent/2))
@@ -238,7 +239,7 @@ class shot_stream:
             plt.gca().grid()
             
             plt.title("Coverage")
-            #return shots
+
 
         elif box.dim_z == 0:
             print('Coverage plot is only available in 3D spheres')
@@ -339,12 +340,12 @@ class shot_stream:
 
         Note:
             The function assumes that the rectangular surface dimensions are provided by the `self.domain_dimensions` attribute.
-            The width and height of the rectangular surface are calculated as (2/3) times the x-dimension and z-dimension respectively.
+           
         """
         
         box = self.domain_dimensions
 
-        return covered_area(circle_centers,shots_dents,(2/3)*box.dim_x/2,(2/3)*box.dim_z/2,resolution)
+        return covered_area(circle_centers,shots_dents, box.dim_x - 2*self.mean_radius[0], box.dim_z - 2*self.mean_radius[0],resolution)
 
 
 
