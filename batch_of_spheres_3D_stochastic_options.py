@@ -55,7 +55,7 @@ def main():
     proportion = mix_distribution.mix_proportion
     
     spheres_number = [int(total_spheres*proportion), int(total_spheres*(1-proportion))] # total number of sphere created
-    spheres_number = total_spheres
+    #spheres_number = total_spheres
     # Define FE length for spheres
     element_length = 0.04
 
