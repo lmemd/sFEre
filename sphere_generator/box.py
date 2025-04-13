@@ -1,13 +1,7 @@
 class generic_box:
     """
-    This class describes the modeled sphere, either it is in 2 or 3 dimensions,
+    This class describes the modelled box, either it is in 2 or 3 dimensions,
     """
-    
-    dim_x = 0
-    dim_y = 0
-    dim_z = 0
-    
-
     def __init__(self,dim_xx,dim_yy,dim_zz):
         
         self.dim_x = dim_xx

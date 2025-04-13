@@ -22,23 +22,14 @@ class shot_stream:
        mean_radius (float) : The average radius of the shots
        radius_standard_deviation (float) : The standard deviation of the diameter
     """   
-    
-    number_of_spheres = 1
-    problem_dimensions = 0
-    domain_dimensions = None
-    impact_angle = 0
-    box_offset_dists = (0,0,0)
-    mean_radius = 0 
-    radius_standard_deviation = 0
-
     def __init__(self, 
-                number_of_spheres_setter, 
-                problem_dimensions_setter, 
-                domain_dimensions_setter,
-                impact_angle_setter,
-                box_offset_dists_setter=(0,0,0),     
-                mean_radius_setter=mean_radius,
-                radius_standard_deviation_setter=radius_standard_deviation, 
+                number_of_spheres_setter = 1, 
+                problem_dimensions_setter = 3, 
+                domain_dimensions_setter = None,
+                impact_angle_setter = 0.0,
+                box_offset_dists_setter = (0,0,0),     
+                mean_radius_setter= 0.0,
+                radius_standard_deviation_setter = 0.0, 
                 ):
 
 
@@ -319,7 +310,7 @@ class shot_stream:
 
         box = self.domain_dimensions
 
-        total_volume = sum([s.volume() for s in list_of_spheres])        
+        total_volume = sum([s.volume for s in list_of_spheres])        
 
         if box.dim_z == 0:    
             return total_volume/(box.dim_x*box.dim_y)  

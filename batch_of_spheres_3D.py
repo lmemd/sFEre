@@ -70,6 +70,7 @@ def main():
         #Calculate percentage of coverage
         shot_dents_radii = [impigment_diameter_calculation(sph.r,70)/2 for sph in spheres_list]
         print(shot_dents_radii)
+
         centers = [(sph.x , sph.z) for sph in spheres_list]
         coverage = stream.calculate_coverage(centers,shot_dents_radii,0.01)
         coverage_list.append(coverage)

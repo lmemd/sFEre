@@ -8,7 +8,7 @@
     - email: clgakias@auth.gr
     - LinkedIn: https://www.linkedin.com/in/christos-gakias-367455195
 - [_**Lamprou Apostolos**_](https://github.com/aalamprou)
-    - MSc student, Laboratory of Machine Elements and Machine Design, Aristotle University of Thessaloniki
+    - Dipl. Mechanical Engineer & Software Engineer II, Cadence Desing Systems, Thessaloniki 
     - email: lamprou.tolis@gmail.com
     - LinkedIn: www.linkedin.com/in/aalamprou
     

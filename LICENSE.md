@@ -1,5 +1,5 @@
 Copyright (c) 2022 Apostolos Lamprou and Gakias Christos - Laboratory of Machine Elements
-and Machine Designe, Aristotle University of Thessaloniki
+and Machine Design, Aristotle University of Thessaloniki
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

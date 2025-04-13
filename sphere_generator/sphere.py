@@ -4,13 +4,7 @@ class generic_sphere:
     """
     This class describes the modeled sphere, either it is in 2 or 3 dimensions,
     """
-    
-    x = 0
-    y = 0
-    z = 0
-    r = 0
-
-    def __init__(self,xx,yy,zz,rr):
+    def __init__(self,xx = 0.0, yy = 0.0, zz = 0.0, rr = 0.0):
         """Initialization of the sphere and the dimenstions that it exists
 
         Args:
@@ -26,6 +20,7 @@ class generic_sphere:
         self.z = zz
         self.r = rr
     
+    @property
     def volume(self):
         pass
 
@@ -34,18 +29,26 @@ class sphere_2D(generic_sphere):
     def __init__(self,xx,yy,rr):
         super().__init__(xx,yy,0,rr)
     
+    #using private _area function to give the user context about what volume returns for 2D spheres
+    def _area(self):
+        return math.pi * self.r ** 2
+    
+    #attribute to be user friendly
+    @property
     def volume(self):
         """calculates the volume of a 2D sphere (disc area) for the current radius
 
         Returns:
             Disc Area (float): the disc area
         """
-        return math.pi*(self.r**2)
+        return self._area()
     
 class sphere_3D(generic_sphere):
     def __init__(self,xx,yy,zz,rr):
         super().__init__(xx,yy,zz,rr)
            
+    #attribute to be user friendly
+    @property
     def volume(self):
         """calculates the volume of a 2D sphere (disc area) for the current radius
 
