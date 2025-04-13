@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from FE_mesh.utilities import working_directory, merge_txt_files
-
+from sieve_analysis_tools import velocity_stochasticity as vs
 
 def section(PID, MID = 1000000, ELFORM = 1):
     """This function defines a section, which 
@@ -80,6 +80,7 @@ def output_keyword_file(nodes_s, elements_s, pid, filename, velocity = [], angle
     """
     change_path = os.getcwd()
     os.chdir(change_path)
+    os.chdir(change_path)
 
     # creating txt files (NEEDS TO BE FIXED)
     np.savetxt('nodes.txt', nodes_s, header="*KEYWORD\n*NODES", fmt="%i,%f,%f,%f", comments="")
@@ -119,6 +120,7 @@ def output_include_file(nodes_s, elements_s, pid, filename, velocity = [], angle
     """
     change_path = os.getcwd()
     os.chdir(change_path)
+    os.chdir(change_path)
 
     # creating txt files (NEEDS TO BE FIXED)
     np.savetxt('nodes.txt', nodes_s, header="*KEYWORD\n*NODES", fmt="%i,%f,%f,%f", comments="")
@@ -148,6 +150,7 @@ def output_general_file(nodes_s, elements_s, filename, ending = ".txt"):
     """
     change_path = os.getcwd()
     os.chdir(change_path)
+    os.chdir(change_path)
 
     # creating txt files (NEEDS TO BE FIXED)
     np.savetxt('nodes.txt', nodes_s, header="*KEYWORD\n*NODES", fmt="%i,%f,%f,%f", comments="")
@@ -163,26 +166,51 @@ def output_general_file(nodes_s, elements_s, filename, ending = ".txt"):
     os.chdir(change_path)
 
     
-def apply_initial_velocity(filename, user_initial_velocity, angle, pid = 1):
-    """Applies (or not) initial velocity to sphere entities.
-    ONLY FOR LSDYNA file form!!!
+def apply_initial_velocity(filename, user_initial_velocity, velocity_stochasticity_option, *stochasticity_args,angle, pid = 1):
+    """Applies (or not) initial velocity to sphere entities in an LS-DYNA file.
 
     Args:
-        filename (string): Output filename.
-        nodes (array): Nodes matrix.
-        elements (array): Elements matrix. 
-        pid (int): PID.
-        initial_velocity (float): Initial velocity to be applied.
-        angle (float): Impact angle to be applied.
+        filename (str): Name of the output LS-DYNA file.
+        user_initial_velocity (float or int or False): The initial velocity to be applied. If False, no velocity is applied.
+        velocity_stochasticity_option (str): The type of stochasticity to apply to the initial velocity. Valid options are "Normal distribution", "Mixed random", and "Uniform".
+        stochasticity_args (tuple): The arguments to be passed to the stochasticity function.
+        angle (float): The impact angle to apply.
+        pid (int): The process ID for the LS-DYNA file.
 
     Raises:
-        TypeError: Error occuring when input type for initial velocity is incompatible.
+        TypeError: If user_initial_velocity is not False, float, or int.
+
+    Notes:
+        - This function modifies the LS-DYNA file at `filename` to apply the specified initial velocity and angle to any sphere entities.
+        - If `user_initial_velocity` is False, no velocity is applied.
+        - If `user_initial_velocity` is a float or int, it will be used directly as the initial velocity.
+        - If `velocity_stochasticity_option` is "Normal distribution", the `vs.normally_distributed_velocity()` function will be used to apply a normally-distributed stochastic velocity.
+        - If `velocity_stochasticity_option` is "Mixed random", the `vs.mixed_random_velocities()` function will be used to apply mixed random velocities.
+        - If `velocity_stochasticity_option` is "Uniform", `numpy.random.uniform()` will be used to apply a uniform stochastic velocity.
     """
     change_path = os.getcwd()
     os.chdir(change_path)
-
-    #working_directory(change_path + '/generated_spheres/')
+    
     if isinstance(user_initial_velocity, (float, int)) and not user_initial_velocity == True or not user_initial_velocity:
+        
+        #feature for application of stochastic velocity to the stream added
+        if velocity_stochasticity_option == "Normal distribution":
+            if user_initial_velocity != stochasticity_args[0]:
+                print('WARNING: Requested velocity of ' + str(user_initial_velocity) + ' m/s do not match with the input average velocity of ' + str(stochasticity_args[0]) + ' m/s. \n' + str(stochasticity_args[0]) + ' m/s will be used instead as nominal-average velocity.')
+            user_initial_velocity = vs.normally_distributed_velocity(*stochasticity_args)[0]
+            print("applied velocity: ", user_initial_velocity)
+        
+        elif velocity_stochasticity_option == "Mixed random":
+            user_initial_velocity = vs.mixed_random_velocities(*stochasticity_args)
+            print("applied velocity: ", user_initial_velocity)
+        
+        elif velocity_stochasticity_option == "Uniform":
+            user_initial_velocity = np.random.uniform(*stochasticity_args)
+            print("applied velocity: ", user_initial_velocity)
+        
+        else:
+            print("Arguments for initial velocity stochasticity not found, constant velocity applied: ", user_initial_velocity)
+  
         if os.path.exists(f"{filename}.k"):
             initial_velocity(pid, user_initial_velocity, angle)
             with open("initial_velocity.txt", "r+") as f:
@@ -202,6 +230,7 @@ def apply_initial_velocity(filename, user_initial_velocity, angle, pid = 1):
             os.remove("initial_velocity.txt")
         else:
             print("Initial velocity can only be applied for LS-DYNA file forms.")
+        return user_initial_velocity
     else:
         raise TypeError("initial_velocity should be set as False or int/float!")
 

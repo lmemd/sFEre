@@ -6,7 +6,10 @@ import random
 import math
 from matplotlib import pyplot as plt
 import numpy as np
-
+from sieve_analysis_tools import statistical_tools as st
+import sieve_analysis_tools.distributions as dist
+import sieve_analysis_tools.statistical_tools as st
+from .utilities import impigment_diameter_calculation,covered_area
 class shot_stream:
     """A class that describes the shot stream
 
@@ -16,30 +19,52 @@ class shot_stream:
        domain_dimensions (box) : The box dimensions (width,height,length) in which the stream exists
        impact angle (float) : The angle of the stream in degrees.
        box_offset_dists (tupple) : The distances for the stream to be offseted in space
-       mean_diameter (float) : The average diameter of the shots
-       diameter_standard_deviation (float) : The standard deviation of the diameter
-    """
+       mean_radius (float) : The average radius of the shots
+       radius_standard_deviation (float) : The standard deviation of the diameter
+    """   
     
     number_of_spheres = 1
     problem_dimensions = 0
     domain_dimensions = None
     impact_angle = 0
     box_offset_dists = (0,0,0)
-    mean_diameter = 0 
-    diameter_standard_deviation = 0
+    mean_radius = 0 
+    radius_standard_deviation = 0
 
-    def __init__(self,number_of_spheres_setter,problem_dimensions_setter,domain_dimensions_setter,impact_angle_setter, mean_diameter_setter, diameter_standard_deviation_setter,box_offset_dists_setter=(0,0,0)):
+    def __init__(self, 
+                number_of_spheres_setter, 
+                problem_dimensions_setter, 
+                domain_dimensions_setter,
+                impact_angle_setter,
+                box_offset_dists_setter=(0,0,0),     
+                mean_radius_setter=mean_radius,
+                radius_standard_deviation_setter=radius_standard_deviation, 
+                ):
+
+
         """Initialize attributes with given values
         """
-        self.number_of_spheres = number_of_spheres_setter
         self.problem_dimensions = problem_dimensions_setter
         self.domain_dimensions = domain_dimensions_setter
         self.impact_angle = impact_angle_setter
         self.box_offset_dists = box_offset_dists_setter
-        self.mean_diameter = mean_diameter_setter
-        self.diameter_standard_deviation = diameter_standard_deviation_setter
         
-    
+        if isinstance(mean_radius_setter, list):
+            self.mean_radius = mean_radius_setter
+        else:
+            self.mean_radius = [mean_radius_setter]
+
+        if isinstance(radius_standard_deviation_setter, list):
+            self.radius_standard_deviation = radius_standard_deviation_setter
+        else:
+            self.radius_standard_deviation = [radius_standard_deviation_setter]
+        
+        if isinstance(number_of_spheres_setter,list):
+            self.number_of_spheres = number_of_spheres_setter
+        else:
+            self.number_of_spheres = [number_of_spheres_setter]
+
+
     def random_sphere_inside_box(self,r):
         """Creates a sphere, random positioned INSIDE the given box using a uniform distribution. Specifically the WHOLE sphere must lies 
        inside the box. The box may be inclined, in a specified angle. The center of the bottom surface of
@@ -113,29 +138,58 @@ class shot_stream:
         return spheres
 
     def generate(self):
-        """Generates a shot stream, according to given attributes. The spheres are not intersecting.
+        """Generates a shot stream according to the given attributes. The spheres are not allowed to intersect.
 
-        Returns:
-            list: A list of spheres
+            Returns:
+                list: A list of spheres
+
+            Raises:
+                AssertionError: If the lengths of `mean_radius`, `radius_standard_deviation`, and `number_of_spheres`
+                                do not match.
+
+            Notes:
+                The method generates spheres for each combination of mean radius, standard deviation, and number of spheres
+                specified in the respective attributes. The spheres are randomly created and allocated in space, following
+                the specified distribution parameters. The method checks for intersections with previously generated spheres
+                to ensure non-intersecting spheres are added to the shot stream. The process continues until the requested
+                number of spheres for each combination is achieved or the maximum number of loop iterations is reached.
+
+                The lengths of `mean_radius`, `radius_standard_deviation`, and `number_of_spheres` must match, indicating the
+                number of combinations to generate.
+
+                If the requested number of spheres cannot be achieved due to intersections, a warning message is printed,
+                and the actual number of created spheres is returned.
+
         """
         no_sphere_loops = 0 #total number of loops for each distribution. If they exceed a limit, the loop stops
-        spheres = []
-        
+        spheres = []        
         #Loop for each shot
         #####################################################
-        while len(spheres) < self.number_of_spheres and no_sphere_loops <= 2e2:
-            
-            #create and allocate the sphere in space
-            #####################################################
-            r = random.gauss(self.mean_diameter,self.diameter_standard_deviation)          
-            s = self.random_sphere_inside_box(r)
-            ######################################################
+        for m,std,no in zip(self.mean_radius,self.radius_standard_deviation,self.number_of_spheres):
+            spheres_counter = 0
+            while spheres_counter < no and no_sphere_loops <= 2e3:
+                
+                #create and allocate the sphere in space
+                #####################################################
+                
+                r = random.gauss(m,std)
+                s = self.random_sphere_inside_box(r)
+                
+                ######################################################
+                #spheres.append(s)
+                
+                #check if size criteria are satisfied
+                intersection = self.intersects_existing(s,spheres)
+                if not intersection:
+                    spheres_counter += 1
+                    spheres.append(s) #add the created sphere to the list
+                    no_sphere_loops = 0 #zero-out the sphere loops iterator
+                else:
+                    no_sphere_loops += 1
 
-            #check if size criteria are satisfied
-            if not s.r < 0.1 and not s.r > 2 and not s.y < s.r + 0.01 and not self.intersects_existing(s,spheres):
-                spheres.append(s) #add the created sphere to the list
-                no_sphere_loops = 0 #zero-out the sphere loops iterator
-
+        if sum(self.number_of_spheres) > len(spheres):
+                print("Requested number of spheres could not be achieved due to intersections, a total of " + str(len(spheres)) + " created instead.")
+        
         return spheres
 
     def intersects_existing(self,sph,spheres):
@@ -152,11 +206,12 @@ class shot_stream:
      
         for s in spheres:
             dist = math.sqrt((sph.x-s.x)**2 + (sph.y-s.y)**2 + (sph.z-s.z)**2)
-            if dist <= s.r + sph.r:
+            if dist < s.r + sph.r:
                 return True
+
         return False
 
-    def plot_coverage(self,spheres):
+    def plot_coverage(self,spheres,nominal_velocity=None):
         """Plots the spot marks of the shot impact, in the area of interest. Only works for vertical shot stream.
            The radius of each spot mark is calculated as the 34% of the sphere diameter. For example a sphere with
            a diameter of 1.2 mm, will leave a spot mark with radius 0.41 mm.
@@ -165,14 +220,17 @@ class shot_stream:
             spheres (list): The spheres list of the shot stream
         """
         box = self.domain_dimensions
+
+        plt.figure()
         if box.dim_z != 0:
-
+            shots = []  
             for sph in spheres:
-                dent = 2*sph.r*(0.4/1.18)
-
+                
+                dent = impigment_diameter_calculation(sph.r,nominal_velocity) 
+                
                 circle = plt.Circle((sph.x, sph.z), dent/2 , edgecolor = 'black', facecolor = 'red', alpha = 0.08)
                 plt.gca().add_patch(circle)
-
+                shots.append((sph.x, sph.z, dent/2))
             plt.gca().set_xlim((-box.dim_x/2, box.dim_x/2))
             plt.gca().set_ylim((-box.dim_z/2, box.dim_z/2))
             
@@ -181,72 +239,62 @@ class shot_stream:
             plt.gca().grid()
             
             plt.title("Coverage")
-            plt.show()
-        
+
+
         elif box.dim_z == 0:
             print('Coverage plot is only available in 3D spheres')
             return
-    
+        
+
     def plot_spheres(self,spheres):
         """Plots the generated spheres, in space or in plane.
-           WARNING: Definitely needs optimization
 
         Args:
             spheres (list): The spheres list of the shot stream
         """
         
         box = self.domain_dimensions
-        points = np.empty((0,3), int)
-        radii  = np.empty((0,1), int)
-
+        
+        x_centers = np.empty((0,), dtype=float)
+        y_centers = np.empty((0,), dtype=float)
+        z_centers = np.empty((0,), dtype=float)
+        radii = np.empty((0,), dtype=float)
+        
         for sph in spheres:
             
-            points = np.append(points, np.array([[sph.x,sph.y,sph.z]]), axis=0)
-            radii = np.append(radii, np.array([[sph.r]]), axis=0)
+            x_centers = np.append(x_centers, sph.x)
+            y_centers = np.append(y_centers, sph.y)
+            z_centers = np.append(z_centers, sph.z)
+            radii = np.append(radii, sph.r)
 
         if box.dim_z != 0:
 
-            def disks2(disk, radius):
-                """Creates the 2D disk in parametric form, to be used in 3D sphere plotting.
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
 
-                Args:
-                    disk (list): The list with x,y,z coordinates
-                    radius (float): The radius of the sphere
+            # Plot each sphere
+            for x_center, y_center, z_center, radius in zip(x_centers, y_centers, z_centers, radii):
+                u, v = np.mgrid[0:2*np.pi:20j, 0:np.pi:10j]
+                x = x_center + radius*np.cos(u)*np.sin(v)
+                y = y_center + radius*np.sin(u)*np.sin(v)
+                z = z_center + radius*np.cos(v)
+                ax.plot_wireframe(x, y, z, color='b')
 
-                Returns:
-                    float: the x,y,z coordinates of the sphere in space
-                """
-                u = np.linspace(0, 2 * np.pi, 100)
-                v = np.linspace(0, np.pi, 100)
-                x = radius * np.outer(np.cos(u), np.sin(v))
-                y = radius * np.outer(np.sin(u), np.sin(v))
-                z = radius * np.outer(np.ones(np.size(u)), np.cos(v))
-                
-                return x+disk[0],y+disk[1],z+disk[2]
-
-            def plotting_spheres(data,box_dimensions):
-                """Main plotter of the 3D sphere
-
-                Args:
-                    data (list): The list with the x,z,y and u,v parameters
-                    box_dimensions (tuple): The dimensions of the 3D space
-                """
-                fig = plt.figure(figsize=(12,12), dpi=300)
-                ax = fig.add_subplot(111, projection='3d')
-                for k,sph in enumerate(data):
-                    x, y, z = sph[0], sph[1], sph[2]
-                    ax.plot_surface(x, y, z,  rstride=4, cstride=4, 
-                                    color = 'blue', linewidth=0, alpha=0.5)
-
-                ax.set_box_aspect(aspect = box_dimensions)
-                plt.show()
+            # Set the limits of each axis to be equal and set the aspect ratio
+            ax.set_xlim(-box.dim_x/2, box.dim_x/2)
+            ax.set_ylim(0, box.dim_y)
+            ax.set_zlim(-box.dim_z/2, box.dim_z/2)
+            ax.set_box_aspect((1,1,1))  # set the aspect ratio to be equal
             
-            data = [disks2(points[k,:], radii[k]) for k in range(self.number_of_spheres)]
-            plotting_spheres(data,(box.dim_x,box.dim_y,box.dim_z))
+            # Set axis labels and display plot
+            ax.set_xlabel('X')
+            ax.set_ylabel('Y')
+            ax.set_zlabel('Z')
+            
 
         elif box.dim_z == 0:
-            for coord,radius in zip(points,radii):
-                circle = plt.Circle((coord[0], coord[1]), radius , edgecolor = 'black', facecolor = 'red', alpha = 0.3)
+            for x_center, y_center, radius in zip(x_centers, y_centers,radii):
+                circle = plt.Circle((x_center, y_center), radius , edgecolor = 'black', facecolor = 'red', alpha = 0.3)
             
                 plt.gca().set_xlim((-box.dim_x/2, box.dim_x/2))
                 plt.gca().set_ylim((0, box.dim_y))
@@ -256,7 +304,7 @@ class shot_stream:
                 plt.gca().set_aspect('equal')
 
                 plt.gca().grid()
-            plt.show()
+            
 
     def calculate_density_of_spheres(self,list_of_spheres):
         """Calculates the ratio of the occupied by spheres volume. 
@@ -277,4 +325,58 @@ class shot_stream:
             return total_volume/(box.dim_x*box.dim_y)  
         else:
             return total_volume/(box.dim_x*box.dim_y*box.dim_z)
+
+    def calculate_coverage(self,circle_centers,shots_dents,resolution):
+        """
+        Calculate the coverage percentage of a rectangular surface given the circle centers and dent radii of shots.
+
+        Parameters:
+            circle_centers (list): List of (x, y) coordinates representing the centers of the circles.
+            shots_dents (list): List of dent (impigment) radii corresponding to each circle.
+            resolution (float): Grid resolution for dividing the surface.
+
+        Returns:
+            list: List of percentages representing the coverage of the rectangular surface for each threshold value.
+
+        Note:
+            The function assumes that the rectangular surface dimensions are provided by the `self.domain_dimensions` attribute.
+           
+        """
+        
+        box = self.domain_dimensions
+
+        return covered_area(circle_centers,shots_dents, box.dim_x - 2*self.mean_radius[0], box.dim_z - 2*self.mean_radius[0],resolution)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

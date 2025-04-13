@@ -2,11 +2,10 @@ import numpy as np
 import sys 
 import sphere_generator
 from FE_mesh.configure_sphere_entity import sphere_entity
-from FE_mesh.LSDYNA_keyword_manager import output_keyword_file, output_general_file
+from FE_mesh.LSDYNA_keyword_manager import output_keyword_file, output_general_file, output_include_file
 from FE_mesh.utilities import working_directory
-import os
 
-def mesh_interface(mesh_method, spacing_method, spheres, element_length, filename, output_path,  output_option, pid = 1, renumbering_point = 0):
+def mesh_interface(mesh_method, spacing_method, spheres, element_length, filename, output_path, output_option, pid = 1, renumbering_point = 0):
     """Generates a batch with multiple spheres, based on given positions,
     radiuses and other characteristics included in the analysis.
 
@@ -24,9 +23,7 @@ def mesh_interface(mesh_method, spacing_method, spheres, element_length, filenam
     Returns:
         list: Nodes and elements of sphere mesh.
     """
-    
     working_directory(output_path)
-        
     if not isinstance(spheres, list):
         spheres = [spheres]
     
@@ -62,6 +59,8 @@ def mesh_interface(mesh_method, spacing_method, spheres, element_length, filenam
             output_general_file(nodes_all, elements_all, filename)
         elif output_option == "LSDYNA":
             output_keyword_file(nodes_all, elements_all, pid, filename)
+        elif output_option == "LSDYNA-entities":
+            output_include_file(nodes_all, elements_all, pid, filename)
         else:
             print("Nothing was outputed.")
 
