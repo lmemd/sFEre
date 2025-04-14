@@ -1,19 +1,58 @@
-class generic_box:
+class Box:
     """
     This class describes the modelled box, either it is in 2 or 3 dimensions,
     """
-    def __init__(self,dim_xx,dim_yy,dim_zz):
+    def __init__(self,dim_width,dim_height,dim_len):
         
-        self.dim_x = dim_xx
-        self.dim_y = dim_yy
-        self.dim_z = dim_zz
+        self.dim_width = dim_width
+        self.dim_height = dim_height
+        self.dim_len = dim_len
         
-class box_2D(generic_box):
+class Box_2D(Box):
 
-    def __init__(self,dim_xx,dim_yy):
-        super().__init__(dim_xx,dim_yy,0)
+    def __init__(self,dim_width = 0,dim_height = 0):
+        super().__init__(dim_width,dim_height,0)
         
-class box_3D(generic_box):
-    def __init__(self,dim_xx,dim_yy,dim_zz):
-        super().__init__(dim_xx,dim_yy,dim_zz)
+    @property
+    def dim_x(self)->float:
+        return self.dim_width
+    
+    @dim_x.setter
+    def dim_x(self, dim_x)->None:
+        self.dim_width = dim_x
+    
+    @property
+    def dim_y(self)->float:
+        return self.dim_height
+    
+    @dim_y.setter
+    def dim_y(self, dim_y)->None:
+        self.dim_height = dim_y
 
+class Box_3D(Box):
+    def __init__(self,dim_width = 0,dim_height = 0,dim_len = 0):
+        super().__init__(dim_width,dim_height,dim_len)
+
+    @property
+    def dim_x(self)->float:
+        return self.dim_width
+    
+    @dim_x.setter
+    def dim_x(self, dim_x)->None:
+        self.dim_width = dim_x
+    
+    @property
+    def dim_y(self)->float:
+        return self.dim_height
+    
+    @dim_y.setter
+    def dim_y(self, dim_y)->None:
+        self.dim_height = dim_y
+
+    @property
+    def dim_z(self)->float:
+        return self.dim_len
+    
+    @dim_z.setter
+    def dim_z(self, dim_z)->None:
+        self.dim_len = dim_z

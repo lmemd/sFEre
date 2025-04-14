@@ -1,6 +1,6 @@
 import math
 
-class generic_sphere:
+class Sphere:
     """
     This class describes the modeled sphere, either it is in 2 or 3 dimensions,
     """
@@ -21,21 +21,21 @@ class generic_sphere:
         self.r = rr
     
     @property
-    def volume(self):
+    def volume(self)->None:
         pass
 
-class sphere_2D(generic_sphere):
+class sphere_2D(Sphere):
 
     def __init__(self,xx,yy,rr):
         super().__init__(xx,yy,0,rr)
     
     #using private _area function to give the user context about what volume returns for 2D spheres
-    def _area(self):
+    def _area(self)->float:
         return math.pi * self.r ** 2
     
     #attribute to be user friendly
     @property
-    def volume(self):
+    def volume(self)->float:
         """calculates the volume of a 2D sphere (disc area) for the current radius
 
         Returns:
@@ -43,13 +43,13 @@ class sphere_2D(generic_sphere):
         """
         return self._area()
     
-class sphere_3D(generic_sphere):
+class sphere_3D(Sphere):
     def __init__(self,xx,yy,zz,rr):
         super().__init__(xx,yy,zz,rr)
            
     #attribute to be user friendly
     @property
-    def volume(self):
+    def volume(self)->float:
         """calculates the volume of a 2D sphere (disc area) for the current radius
 
         Returns:

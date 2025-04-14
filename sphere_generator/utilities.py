@@ -1,8 +1,8 @@
-from .box import box_2D,box_3D
+from .box import Box, Box_2D, Box_3D
 import numpy as np
 from matplotlib import pyplot as plt
 
-def problem_dimensions_setter(dimensions):
+def problem_dimensions_setter(dimensions : str)->int:
     """Sets the problem dimensions, they may be 2 or 3
 
     Args:
@@ -16,17 +16,17 @@ def problem_dimensions_setter(dimensions):
         integer: The problem dimensions
     """
 
-    if isinstance(dimensions,str):
-        if dimensions == '2D':
-            return int(2)
-        elif dimensions == '3D':
-            return int(3)
-        else:
-            raise Exception('Please input 2D for a two-dimensional problem and 3D for a three-dimensional problem')
-    else:
+    if not isinstance(dimensions, str):
         raise Exception('Input must be a string')
 
-def box_getter(integer_dimensions, box_width, box_height, box_length = None):
+    if dimensions == '2D':
+        return 2
+    elif dimensions == '3D':
+        return 3
+    else:
+        raise Exception('Please input 2D for a two-dimensional problem and 3D for a three-dimensional problem')
+
+def box_getter(integer_dimensions : int, box_width : float, box_height : float, box_length : float = None)->Box:
     """Get the box in the specified dimensions
 
     Args:
@@ -41,12 +41,18 @@ def box_getter(integer_dimensions, box_width, box_height, box_length = None):
     Returns:
         box: The created box
     """
-    if integer_dimensions == 3:
-        return box_3D(box_width,box_height,box_length)
-    elif integer_dimensions == 2:
-        return box_2D(box_width,box_height)
-    else:
+    
+    #if number of dimension is float, raise error
+    if not isinstance(integer_dimensions, int):
         raise Exception('Problem dimensions must be integer')
+    
+    if integer_dimensions == 3:
+        return Box_3D(box_width,box_height,box_length)
+    elif integer_dimensions == 2:
+        return Box_2D(box_width,box_height)
+    else:
+        #return generic Box (not implemented)
+        return Box(box_width, box_height, box_length)
     
 def impigment_diameter_calculation(radius,velocity=None):
     """
