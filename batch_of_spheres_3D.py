@@ -89,7 +89,6 @@ def main():
     list_to_print.insert(0,'X coord    Y coord    Z coord    Radius')
     print(*list_to_print, sep='\n')
 
-from sphere_generator import box_getter
 if __name__ == "__main__":
     main()
 
