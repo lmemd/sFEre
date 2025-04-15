@@ -11,11 +11,16 @@ def main():
     mean_radius = 1.4/2 # average radius of created sphere
     radius_std = 0.135/2 # standard deviation of radius for the created sphere
     spheres_number = 2 # total number of sphere created
-    spheres_batches = 1 # change this variable if you want to create more than one batch of shots
+    spheres_batches = 20 # change this variable if you want to create more than one batch of shots
 
     # Define FE length for spheres
-    
     element_length = 0.04
+
+    # Initial velocity applied m/s and velocity configuration
+    velocity = 75 
+    velocity_standard_deviation = 5
+    maximum_velocity = velocity
+    minimum_velocity = 65
 
     # Define the domain characteristics (the space that contains the created spheres)
     box_width = 3 # width of the domain containing the spheres (alongside X axis)
@@ -39,6 +44,7 @@ def main():
 
     spheres_list = [] # initialize empty spheres list
     coverage_list = []
+    velocities_list = []
     for set_number in range(spheres_batches):
 
         # Generate stream of random distributed shots in space
@@ -58,29 +64,31 @@ def main():
         #mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA-entities", pid = 1000000, renumbering_point=10000000)
 
         # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
-        # Currently, an absolute initial velocity of 70 m/s will be applied.
-        #apply_initial_velocity(filename, 75, box_angle)
-        #velocity_params = (70, 70*0.05)
-        #applied_velocity = apply_initial_velocity(filename, 75, "Normal distribution", *velocity_params, angle = box_angle, pid=1000000)
+        applied_velocity = apply_initial_velocity(filename, "Normal distribution", *(velocity, velocity_standard_deviation, minimum_velocity, maximum_velocity), angle = box_angle, dyna_id=1000000)
+        velocities_list.append(applied_velocity)
         spheres_list.extend(spheres)
+
+        
 
         # 3D plot of generated spheres        
         #stream.plot_spheres(spheres_list)
 
         #Calculate percentage of coverage
-        shot_dents_radii = [impigment_diameter_calculation(sph.r,70)/2 for sph in spheres_list]
-        print(shot_dents_radii)
+        shot_dents_radii = [impigment_diameter_calculation(sph.r,velocity)/2 for sph in spheres_list]
 
         centers = [(sph.x , sph.z) for sph in spheres_list]
         coverage = stream.calculate_coverage(centers,shot_dents_radii,0.01)
         coverage_list.append(coverage)
     
+
+    plt.hist(velocities_list,bins=10)
+
     plt.figure()
     transposed_data = np.transpose(coverage_list)
     for i, item_group in enumerate(transposed_data):
         plt.plot(item_group, label='Item {}'.format(i + 1))
 
-    stream.plot_coverage(spheres_list,70)
+    stream.plot_coverage(spheres_list,velocity)
 
     plt.show()
     

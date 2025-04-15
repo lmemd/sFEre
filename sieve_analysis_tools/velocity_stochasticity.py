@@ -2,8 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import truncnorm
 import sieve_analysis_tools.distributions as dist
+import random
 
-def normally_distributed_velocity(nominal_velocity, standard_deviation, lower_cuttof = 0, upper_cutoff = np.inf):
+def normally_distributed_velocity(nominal_velocity, standard_deviation, lower_cutoff = 0, upper_cutoff = np.inf):
     """
     Generate a normally distributed velocity value based on a given nominal velocity and standard deviation,
     subject to specified lower and upper limits.
@@ -26,15 +27,11 @@ def normally_distributed_velocity(nominal_velocity, standard_deviation, lower_cu
         A random velocity value that follows a normal distribution with mean equal to the nominal velocity and 
         standard deviation equal to the given standard deviation.
     """
-    
-    normalized_std = standard_deviation/nominal_velocity
-    normal_distribution = dist.GaussianDistribution(1,normalized_std)
-    
-    velocity = normal_distribution.generate_random_numbers(1)*nominal_velocity
-    
-    while not lower_cuttof < velocity and not velocity < upper_cutoff:
-        velocity = normal_distribution.generate_random_numbers(1)*nominal_velocity
-    
+    velocity = random.gauss(nominal_velocity,standard_deviation)
+
+    while not (lower_cutoff < velocity < upper_cutoff):
+        velocity = random.gauss(nominal_velocity,standard_deviation)
+
     return velocity
 
 def mixed_random_velocities_generator(mean, std, lower_cutoff, upper_cutoff, lower_range, upper_range, gaussian_weight = 0.5):
