@@ -171,8 +171,7 @@ def apply_initial_velocity(filename, velocity_stochasticity_option, *velocity_ar
 
     Args:
         filename (str): Name of the output LS-DYNA file.
-        user_initial_velocity (float or int or False): The initial velocity to be applied. If False, no velocity is applied.
-        velocity_stochasticity_option (str): The type of stochasticity to apply to the initial velocity. Valid options are "Normal distribution", "Mixed random", and "Uniform".
+        velocity_stochasticity_option (str): The type of stochasticity to apply to the initial velocity. Valid options are "Normal distribution", "Mixed random"
         stochasticity_args (tuple): The arguments to be passed to the stochasticity function.
         angle (float): The impact angle to apply.
         pid (int): The process ID for the LS-DYNA file.
