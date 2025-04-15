@@ -179,7 +179,7 @@ class shot_stream:
                     no_sphere_loops += 1
 
         if sum(self.number_of_spheres) > len(spheres):
-                print("Requested number of spheres could not be achieved due to intersections, a total of " + str(len(spheres)) + " created instead.")
+                print("Requested number of spheres could not be achieved due to intersections, a total of " + str(len(spheres)) + " were created instead.")
         
         return spheres
 

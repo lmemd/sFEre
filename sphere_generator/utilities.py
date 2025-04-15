@@ -2,6 +2,12 @@ from .box import Box, Box_2D, Box_3D
 import numpy as np
 from matplotlib import pyplot as plt
 
+from enum import Enum
+
+class ImpigmentDiameterConstants(Enum):
+    steelApproximation : float = 0.41 * 2
+    approximation : float = 1.278
+
 def problem_dimensions_setter(dimensions : str)->int:
     """Sets the problem dimensions, they may be 2 or 3
 
@@ -72,11 +78,11 @@ def impigment_diameter_calculation(radius,velocity=None):
         D = 2*radius #diameter of the sphere
         v = velocity*1000 #convert velocity from m/s to mm/s
        
-        return 1.278 * D * (P**0.25) * (rho**0.25) * (v**0.5) / (HB**0.25)
+        return ImpigmentDiameterConstants.approximation.value * D * (P**0.25) * (rho**0.25) * (v**0.5) / (HB**0.25)
     
     else: 
         #approximation that is independent of velocity. Applied only to steel shots, for velocites ranged between 40 and 80 m/s
-        return 0.41 * 2 * radius
+        return ImpigmentDiameterConstants.steelApproximation.value * radius
 
     
 def covered_area(circle_centers,dents_radii,surface_width, surface_height,resolution):

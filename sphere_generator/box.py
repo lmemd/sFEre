@@ -29,6 +29,13 @@ class Box_2D(Box):
     def dim_y(self, dim_y)->None:
         self.dim_height = dim_y
 
+    '''provide a read only dim_z option for compatibility with other .py files
+    that use dim_z which now is dim_len
+    default .getter'''
+    @property
+    def dim_z(self):
+        return 0 #for a 2D box that is always zero
+
 class Box_3D(Box):
     def __init__(self,dim_width = 0.0,dim_height = 0.0,dim_len = 0.0):
         super().__init__(dim_width,dim_height,dim_len)

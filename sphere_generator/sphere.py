@@ -24,8 +24,18 @@ class Sphere:
     def volume(self)->None:
         pass
 
-class sphere_2D(Sphere):
+    def __hash__(self):
+        return hash((self.x, self.y, self.z, self.r))
+    
+    def __eq__(self, other):
+        if not isinstance(other, Sphere):
+            return False
+        if self.x == other.x and self.y == other.y and self.z == other.z and self.r == r:
+            return True
+        else:
+            return False
 
+class sphere_2D(Sphere):
     def __init__(self,xx,yy,rr):
         super().__init__(xx,yy,0,rr)
     
@@ -42,6 +52,7 @@ class sphere_2D(Sphere):
             Disc Area (float): the disc area
         """
         return self._area()
+
     
 class sphere_3D(Sphere):
     def __init__(self,xx,yy,zz,rr):
@@ -50,9 +61,9 @@ class sphere_3D(Sphere):
     #attribute to be user friendly
     @property
     def volume(self)->float:
-        """calculates the volume of a 2D sphere (disc area) for the current radius
+        """calculates the volume of a 3D sphere for the current radius
 
         Returns:
-            Disc Area (float): the disc area
+           Sphere Volume (float) : sphere's volume 
         """
         return (4/3)*math.pi*(self.r**3)
