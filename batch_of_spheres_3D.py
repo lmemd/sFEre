@@ -10,7 +10,7 @@ def main():
     filename_to_export = "S460_shots_75_90_No" # name of sphere file
     mean_radius = 1.4/2 # average radius of created sphere
     radius_std = 0.135/2 # standard deviation of radius for the created sphere
-    spheres_number = 20 # total number of sphere created
+    spheres_number = 200 # total number of sphere created
     spheres_batches = 1 # change this variable if you want to create more than one batch of shots
 
     # Define FE length for spheres
@@ -18,9 +18,9 @@ def main():
     element_length = 0.04
 
     # Define the domain characteristics (the space that contains the created spheres)
-    box_width = 300 # width of the domain containing the spheres (alongside X axis)
-    box_length = 300 # length of the domain containing the spheres (alongside Z axis)
-    box_height = 200 # height of the domain containing the spheres (alongside Y axis)
+    box_width = 10 # width of the domain containing the spheres (alongside X axis)
+    box_length = 30 # length of the domain containing the spheres (alongside Z axis)
+    box_height = 20 # height of the domain containing the spheres (alongside Y axis)
     box_angle = 90 # change this value if you want an inlcined box (defined by the angle between the box and the XZ plane)
 
     parent_dir = os.getcwd()
@@ -76,7 +76,7 @@ def main():
         print(shot_dents_radii)
 
         centers = [(sph.x , sph.z) for sph in spheres_list]
-        coverage = stream.calculate_coverage(centers,shot_dents_radii,0.01)
+        coverage = stream.calculate_coverage(centers,shot_dents_radii,0.1)
         coverage_list.append(coverage)
     
     plt.figure()
