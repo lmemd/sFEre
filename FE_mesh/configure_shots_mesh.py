@@ -4,6 +4,7 @@ import sphere_generator
 from FE_mesh.configure_sphere_entity import sphere_entity
 from FE_mesh.LSDYNA_keyword_manager import output_keyword_file, output_general_file, output_include_file
 from FE_mesh.utilities import working_directory
+from FE_mesh.ABAQUS_keyword_manager import output_inp_file
 
 def mesh_interface(mesh_method, spacing_method, spheres, element_length, filename, output_path, output_option, pid = 1, renumbering_point = 0):
     """Generates a batch with multiple spheres, based on given positions,
@@ -61,6 +62,8 @@ def mesh_interface(mesh_method, spacing_method, spheres, element_length, filenam
             output_keyword_file(nodes_all, elements_all, pid, filename)
         elif output_option == "LSDYNA-entities":
             output_include_file(nodes_all, elements_all, pid, filename)
+        elif output_option == 'ABAQUS':
+            output_inp_file(nodes_all, elements_all, pid, filename)
         else:
             print("Nothing was outputed.")
 
