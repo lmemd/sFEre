@@ -76,7 +76,7 @@ def main():
         print(shot_dents_radii)
 
         centers = [(sph.x , sph.z) for sph in spheres_list]
-        coverage = stream.calculate_coverage(centers,shot_dents_radii,0.1)
+        coverage = stream.calculate_coverage(centers,shot_dents_radii,0.01)
         coverage_list.append(coverage)
     
     plt.figure()
