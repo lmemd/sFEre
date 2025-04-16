@@ -1,44 +1,22 @@
 import math
+from .shape import Shape
 
-class Sphere:
-    """
-    This class describes the modeled sphere, either it is in 2 or 3 dimensions,
-    """
-    def __init__(self,xx = 0.0, yy = 0.0, zz = 0.0, rr = 0.0):
-        """Initialization of the sphere and the dimenstions that it exists
-
-        Args:
-            xx (float): x coordinate of the center
-            yy (float): y coordinate of the center
-            zz (float): z coordinate of the center
-            rr (float): radius of the sphere
-            dimension (int): The dimensions that the sphere exists (2D or 3D space)
-        """
-
-        self.x = xx
-        self.y = yy
-        self.z = zz
-        self.r = rr
-    
-    @property
-    def volume(self)->None:
-        pass
-
-    def __hash__(self):
-        return hash((self.x, self.y, self.z, self.r))
-    
-    def __eq__(self, other):
-        if not isinstance(other, Sphere):
-            return False
-        if self.x == other.x and self.y == other.y and self.z == other.z and self.r == r:
-            return True
-        else:
-            return False
-
-class sphere_2D(Sphere):
+class sphere_2D(Shape):
     def __init__(self,xx,yy,rr):
-        super().__init__(xx,yy,0,rr)
+        super().__init__(xx,yy,0.0)
+        self.r = rr
+
+    def __hash__(self)->int:
+        return hash((self.dim_x, self.dim_y, self.dim_y, self.r))
     
+    #overload to know if 2 2D spheres are the same
+    def __eq__(self, other)->None:
+        if not isinstance(other, sphere_2D): #if object is not sphere_2D don't compare
+            return False
+        if self.x == other.x and self.y == other.y and self.r == other.r:
+            return True
+        return False
+
     #using private _area function to give the user context about what volume returns for 2D spheres
     def _area(self)->float:
         return math.pi * self.r ** 2
@@ -54,10 +32,22 @@ class sphere_2D(Sphere):
         return self._area()
 
     
-class sphere_3D(Sphere):
+class sphere_3D(Shape):
     def __init__(self,xx,yy,zz,rr):
-        super().__init__(xx,yy,zz,rr)
+        super().__init__(xx,yy,zz)
+        self.r = rr
            
+    def __hash__(self)->int:
+        return hash((self.x, self.y, self.z, self.r))
+
+   #overload to know if 2 3D spheres are the same 
+    def __eq__(self, other)->None:
+        if not isinstance(other, sphere_3D):
+            return False
+        if self.x == other.x and self.y == other.y and self.z == other.z and self.r == other.r:
+            return True
+        return False
+    
     #attribute to be user friendly
     @property
     def volume(self)->float:

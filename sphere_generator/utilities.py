@@ -1,4 +1,5 @@
-from .box import Box, Box_2D, Box_3D
+from .shape import Shape
+from .box import Box_2D, Box_3D
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -32,7 +33,7 @@ def problem_dimensions_setter(dimensions : str)->int:
     else:
         raise Exception('Please input 2D for a two-dimensional problem and 3D for a three-dimensional problem')
 
-def box_getter(integer_dimensions : int, box_width : float, box_height : float, box_length : float = None)->Box:
+def box_getter(integer_dimensions : int, box_width : float, box_height : float, box_length : float = None)->Shape:
     """Get the box in the specified dimensions
 
     Args:
@@ -57,8 +58,7 @@ def box_getter(integer_dimensions : int, box_width : float, box_height : float, 
     elif integer_dimensions == 2:
         return Box_2D(box_width,box_height)
     else:
-        #return generic Box (not implemented)
-        return Box(box_width, box_height, box_length)
+        return Shape(box_width, box_height, box_length) #return Shape 
     
 def impigment_diameter_calculation(radius,velocity=None):
     """
