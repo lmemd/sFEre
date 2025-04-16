@@ -31,7 +31,7 @@ def mesh_interface(mesh_method, spacing_method, spheres, element_length, filenam
     if not any(isinstance(s, sphere_generator.sphere.sphere_2D) for s in spheres):
 
         nodes_all = np.reshape(np.zeros((1, 4)), (1, 4))
-        elements_all = np.reshape(np.zeros((1, 10)), (1, 10))
+        elements_all = np.reshape(np.zeros((1, 9)), (1, 9))
         for s in spheres:
             [nodes_s_tmp, elements_s_tmp] = sphere_entity(mesh_method, spacing_method, s.r, element_length, s.x, s.y, s.z, pid)
             if len(spheres) > 1:
@@ -39,7 +39,7 @@ def mesh_interface(mesh_method, spacing_method, spheres, element_length, filenam
                 nodes_s_tmp[:, 0] += np.shape(nodes_all)[0] - 1 # here we dont need + 1 
                 # because we have added a row of zeros to be able to call vstack
                 elements_s_tmp[:, 0] += np.shape(elements_all)[0] - 1
-                elements_s_tmp[:, 2:] += np.shape(nodes_all)[0] - 1
+                elements_s_tmp[:, 1:] += np.shape(nodes_all)[0] - 1
 
             else:
                 pass
@@ -54,7 +54,7 @@ def mesh_interface(mesh_method, spacing_method, spheres, element_length, filenam
         
         nodes_all[:, 0] += renumbering_point
         elements_all[:, 0] += renumbering_point
-        elements_all[:, 2:] += renumbering_point
+        elements_all[:, 1:] += renumbering_point
 
         if output_option == "general":
             output_general_file(nodes_all, elements_all, filename)

@@ -82,7 +82,7 @@ def sphere_matrices(method, half_length, no_of_elements, scale_factor, transvers
     elements_s[:, 1:] += 1
 
     # deleting unnecessary nodes from model
-    index_in = np.unique(elements_s[:, 2:])
+    index_in = np.unique(elements_s[:, 1:])
     index_out = nodes_s[:, 0]
     index_in = np.flatnonzero(np.invert(np.isin(index_out, index_in)))
     nodes_s = np.delete(nodes_s, index_in, 0)
@@ -94,8 +94,8 @@ def sphere_matrices(method, half_length, no_of_elements, scale_factor, transvers
     renumbered_id = np.linspace(1, np.shape(old_nodes_id)[0], num=np.shape(old_nodes_id)[0])
     nodes_s[:, 0] = renumbered_id.astype(int)
 
-    elements_s[:, 2:] = renumbering_element_pairs(old_nodes_id, renumbered_id, elements_s[:, 2:])
-    elements_s = np.hstack((elements_s[:, 0:2], elements_s[:, 2:]))
+    elements_s[:, 1:] = renumbering_element_pairs(old_nodes_id, renumbered_id, elements_s[:, 1:])
+    elements_s = np.hstack((elements_s[:, 0:1], elements_s[:, 1:]))
     
     #print("Deleted nodes: %i" %int(np.shape(index_in)[0]))
 

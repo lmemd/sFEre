@@ -162,7 +162,9 @@ def output_general_file(nodes_s, elements_s, filename, ending = ".txt"):
 
     # creating txt files (NEEDS TO BE FIXED)
     np.savetxt('nodes.txt', nodes_s, header="*KEYWORD\n*NODES", fmt="%i,%f,%f,%f", comments="")
-    np.savetxt('elements.txt', elements_all_filtered, header="*ELEMENT_SOLID", fmt="%8i%8i%8i%8i%8i%8i%8i%8i%8i%8i", footer="*END", comments="")
+
+    elem_fmt = ', '.join(['%d'] * elements_all_filtered.shape[1])
+    np.savetxt('elements.txt', elements_all_filtered, header="*ELEMENT_SOLID", fmt=elem_fmt, footer="*END", comments="")
 
     filenames = ['nodes.txt', 'elements.txt']
     merge_txt_files(filenames, '%s%s' %(filename, ending))

@@ -64,8 +64,8 @@ def main():
         # process and output of meshed generated spheres
         
         #mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA-entities", pid = 10000000, renumbering_point=10000000)
-        mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "ABAQUS", pid = 10000000, renumbering_point=10000000)
-        mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "general", pid = 10000000, renumbering_point=10000000)
+        mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "ABAQUS", pid = 1000, renumbering_point=1000)
+        mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "general", pid = 1000, renumbering_point=1000)
         # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
         applied_velocity = apply_initial_velocity(filename, "Normal distribution", *(velocity, velocity_standard_deviation, minimum_velocity, maximum_velocity), angle = box_angle, dyna_id=1000000)
         velocities_list.append(applied_velocity)
