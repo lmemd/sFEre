@@ -9,54 +9,54 @@ class Shape:
 
     #setter/getter methods for compatibility with existing code that uses Box
     @property
-    def dim_x(self):
+    def dim_x(self)->float:
         return self._dim_x
     
     @dim_x.setter
-    def dim_x(self, dim_x):
+    def dim_x(self, dim_x)->None:
         self._dim_x = dim_x
 
     @property
-    def dim_y(self):
+    def dim_y(self)->float:
         return self._dim_y
     
     @dim_x.setter
-    def dim_y(self, dim_y):
+    def dim_y(self, dim_y)->None:
         self._dim_y = dim_y
 
     @property
-    def dim_z(self):
+    def dim_z(self)->float:
         return self._dim_z
     
     @dim_x.setter
-    def dim_z(self, dim_z):
+    def dim_z(self, dim_z)->None:
         self._dim_z = dim_z
     
     #setter/getter methods for compatibility with existing code that uses Sphere
     @property
-    def x(self):
+    def x(self)->float:
         return self._dim_x
     
     @x.setter
-    def x(self, x):
+    def x(self, x)->None:
         self._dim_x = x
 
     @property
-    def y(self):
+    def y(self)->float:
         return self._dim_y
     
     @y.setter
-    def y(self, y):
+    def y(self, y)->None:
         self._dim_y = y
 
     @property
-    def z(self):
+    def z(self)->float:
         return self._dim_z
     
     @z.setter
-    def z(self, z):
+    def z(self, z)->None:
         self._dim_z = z
     
     @property
-    def volume(self):
+    def volume(self)->float:
         pass
