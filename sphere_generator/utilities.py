@@ -160,5 +160,5 @@ def visualize_velocity_distribution(velocities):
     plt.xlabel('Impact velocities')
     plt.ylim(0, 100)
     plt.grid()
-    plt.show()
+
 
