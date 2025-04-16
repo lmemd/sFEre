@@ -64,7 +64,7 @@ def initial_velocity(PID, velocity, angle):
     return variable
 '''
 
-def output_inp_file(nodes_s, elements_s, pid, filename, velocity = [], angle = []):
+def output_inp_file_entities(nodes_s, elements_s, pid, filename):
     """
     Outputs an ABAQUS .inp file with nodes, elements, and optional initial velocity.
 
@@ -77,35 +77,36 @@ def output_inp_file(nodes_s, elements_s, pid, filename, velocity = [], angle = [
         angle (list): Optional angle (not used here).
     """
     
+    change_path = os.getcwd()
+    os.chdir(change_path)
+    os.chdir(change_path)
+
+    #The initial format of element matrix is in LS-Dyna format, which is composed by 10 columns, the second one refers to the PID.
+    #For proper ABAQUS output, this column must be excluded.
+    #elements_all_filtered = np.delete(elements_s, 1, axis=1)
+    elements_all_filtered = elements_s
+
     # Save nodes using np.savetxt
     np.savetxt('nodes.txt', nodes_s, 
                header="*Node", 
                fmt='%d, %.6f, %.6f, %.6f', 
                comments='')
     
-    elem_fmt = ', '.join(['%d'] * elements_s.shape[1])
+    elem_fmt = ', '.join(['%d'] * elements_all_filtered.shape[1])
     # Save elements using np.savetxt
-    np.savetxt('elements.txt', elements_s,
-               header="*Element, type=C3D8R, elset=EALL",
+    np.savetxt('elements.txt', elements_all_filtered,
+               header="*Element, type=C3D8R, elset=P" + str(pid) + ';EALL',
                fmt=elem_fmt,
                comments='')
 
-    # Optional: initial velocity
-    if velocity:
-        with open('velocity.txt', 'w') as vfile:
-            vfile.write("*Initial Conditions, type=velocity\n")
-            for node in nodes_s:
-                vfile.write(f"{int(node[0])}, {velocity[0]}, {velocity[1]}, {velocity[2]}\n")
-
     # Create .inp file by merging
     filenames = ['nodes.txt', 'elements.txt']
-    if velocity:
-        filenames.append('velocity.txt')
+    merge_txt_files(filenames, '%s.inp' %filename)
 
-    with open(f"{filename}.inp", "w") as fout:
-        fout.write("*Heading\n** Generated with output_inp_file\n\n")
-        for fname in filenames:
-            with open(fname, "r") as part:
-                fout.write(part.read())
-                fout.write("\n")
-        fout.write("** End of file\n")
+    os.remove('nodes.txt')
+    os.remove('elements.txt')
+    #os.remove('initial_velocity.txt')
+
+    #changing path in order to produce multiple batches
+    os.chdir(change_path)
+

@@ -72,14 +72,14 @@ def sphere_matrices(method, half_length, no_of_elements, scale_factor, transvers
     nodes_s = np.hstack((np.reshape(index_nodes, (np.shape(nodes_s)[0], 1)), nodes_s))
 
     # pid number needed for elements matrix formation
-    ones2 = pid * np.ones((np.shape(elements_s)[0], 1))
-    ones2 = np.reshape(ones2, (np.shape(ones2)[0], 1))
-    elements_s = np.hstack((np.reshape(elements_s[:, 0], (np.shape(elements_s)[0], 1)), ones2,
-                            elements_s[:, 1:]))
+    #ones2 = pid * np.ones((np.shape(elements_s)[0], 1))
+    #ones2 = np.reshape(ones2, (np.shape(ones2)[0], 1))
+    #elements_s = np.hstack((np.reshape(elements_s[:, 0], (np.shape(elements_s)[0], 1)), ones2,
+    #                        elements_s[:, 1:]))
 
     # renumbering elements indices cause python indexing starts from zero
     # but we want them to start from one
-    elements_s[:, 2:] += 1
+    elements_s[:, 1:] += 1
 
     # deleting unnecessary nodes from model
     index_in = np.unique(elements_s[:, 2:])

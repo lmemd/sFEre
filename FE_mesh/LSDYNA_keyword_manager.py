@@ -65,7 +65,7 @@ def initial_velocity(PID, velocity, angle):
     return variable
 
 
-def output_keyword_file(nodes_s, elements_s, pid, filename, velocity = [], angle = []):
+def output_keyword_file(nodes_s, elements_s, pid, filename):
     """Function which outputs the final keyword file
     including sphere entity.
 
@@ -87,16 +87,17 @@ def output_keyword_file(nodes_s, elements_s, pid, filename, velocity = [], angle
     np.savetxt('elements.txt', elements_s, header="*ELEMENT_SOLID", fmt="%8i%8i%8i%8i%8i%8i%8i%8i%8i%8i", comments="")
 
     section(pid)
-    velocity = initial_velocity(pid, velocity, angle)
+    #velocity = initial_velocity(pid, velocity, angle)
 
-    filenames = ['nodes.txt', 'elements.txt', 'section.txt', 'material.txt', 'initial_velocity.txt']
-    if velocity:
-        merge_txt_files(filenames,'%s.k' %filename)
-    else:
-        merge_txt_files(filenames[0:-1], '%s.k' %filename)
-        """with open('%s.k' %filename, "a+") as f:
-            f.write("*END")
-        f.close()""" # under investigation (if *END is needed at the end of the .k file)
+    #filenames = ['nodes.txt', 'elements.txt', 'section.txt', 'material.txt', 'initial_velocity.txt']
+    filenames = ['nodes.txt', 'elements.txt', 'section.txt', 'material.txt']
+    #if velocity:
+    #    merge_txt_files(filenames,'%s.k' %filename)
+    #else:
+    #    merge_txt_files(filenames[0:-1], '%s.k' %filename)
+    #    """with open('%s.k' %filename, "a+") as f:
+    #        f.write("*END")
+    #    f.close()""" # under investigation (if *END is needed at the end of the .k file)
 
     os.remove('nodes.txt')
     os.remove('elements.txt')
@@ -106,7 +107,7 @@ def output_keyword_file(nodes_s, elements_s, pid, filename, velocity = [], angle
 
 
 
-def output_include_file(nodes_s, elements_s, pid, filename, velocity = [], angle = []):
+def output_include_file(nodes_s, elements_s, pid, filename):
     """Same function as output_keyword_file, 
     but with the absence of property and material.
 
@@ -126,8 +127,9 @@ def output_include_file(nodes_s, elements_s, pid, filename, velocity = [], angle
     np.savetxt('nodes.txt', nodes_s, header="*KEYWORD\n*NODES", fmt="%i,%f,%f,%f", comments="")
     np.savetxt('elements.txt', elements_s, header="*ELEMENT_SOLID", fmt="%8i%8i%8i%8i%8i%8i%8i%8i%8i%8i", comments="")
 
-    initial_velocity(pid, velocity, angle)
-    filenames = ['nodes.txt', 'elements.txt', 'initial_velocity.txt']
+    #initial_velocity(pid, velocity, angle)
+    #filenames = ['nodes.txt', 'elements.txt', 'initial_velocity.txt']
+    filenames = ['nodes.txt', 'elements.txt']
     merge_txt_files(filenames, '%s.k' %filename)
 
     os.remove('nodes.txt')
@@ -152,9 +154,15 @@ def output_general_file(nodes_s, elements_s, filename, ending = ".txt"):
     os.chdir(change_path)
     os.chdir(change_path)
 
+    #The initial format of element matrix is in LS-Dyna format, which is composed by 10 columns, the second one refers to the PID.
+    #For proper ABAQUS output, this column must be excluded.
+    #elements_all_filtered = np.delete(elements_s, 1, axis=1)
+
+    elements_all_filtered = elements_s
+
     # creating txt files (NEEDS TO BE FIXED)
     np.savetxt('nodes.txt', nodes_s, header="*KEYWORD\n*NODES", fmt="%i,%f,%f,%f", comments="")
-    np.savetxt('elements.txt', elements_s, header="*ELEMENT_SOLID", fmt="%8i%8i%8i%8i%8i%8i%8i%8i%8i%8i", footer="*END", comments="")
+    np.savetxt('elements.txt', elements_all_filtered, header="*ELEMENT_SOLID", fmt="%8i%8i%8i%8i%8i%8i%8i%8i%8i%8i", footer="*END", comments="")
 
     filenames = ['nodes.txt', 'elements.txt']
     merge_txt_files(filenames, '%s%s' %(filename, ending))
