@@ -27,6 +27,10 @@ def main():
     problem_dimensions = problem_dimensions_setter("2D") # Input 2D or 3D according to your problem dimensions
     box = box_getter(problem_dimensions,box_width,box_height,box_length) # create the box 
 
+    #if just Shape, exit function
+    if not isinstance(box, Box_2D) and not isinstance(box, Box_3D):
+        return
+    
     #***********************************END OF INPUT SECTION**************************************
 
     spheres_list = [] # initialize empty spheres list, containing all the spheres from every sphere batch
