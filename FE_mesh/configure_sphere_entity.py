@@ -30,7 +30,7 @@ def mesh_configuration(mesh_method, spacing_method, radius, element_length):
     return configs
 
 
-def sphere_matrices(method, half_length, no_of_elements, scale_factor, transverse_no_of_elements, spacing_method, spacing_factor, position_x, position_y, position_z, pid):
+def sphere_matrices(method, half_length, no_of_elements, scale_factor, transverse_no_of_elements, spacing_method, spacing_factor, position_x, position_y, position_z):
     """Creation of sphere entity, with respect in user's 
     inputs.
 
@@ -102,7 +102,7 @@ def sphere_matrices(method, half_length, no_of_elements, scale_factor, transvers
     return nodes_s, elements_s
 
 
-def sphere_entity(mesh_method, spacing_method, radius, element_length, position_x, position_y, position_z, pid):
+def sphere_entity(mesh_method, spacing_method, radius, element_length, position_x, position_y, position_z):
     """Function which creates a sphere entiity, containing 
     nodes and elements matrices.
 
@@ -131,7 +131,7 @@ def sphere_entity(mesh_method, spacing_method, radius, element_length, position_
     mesh_method = configs[6]
     spacing_method = configs[7]
 
-    sphere_entity = sphere_matrices(mesh_method, half_length, inner_elements, scale_factor, layer_elements, spacing_method, spacing_factor, position_x, position_y, position_z, pid)
+    sphere_entity = sphere_matrices(mesh_method, half_length, inner_elements, scale_factor, layer_elements, spacing_method, spacing_factor, position_x, position_y, position_z)
 
     print('\x1b[1;37;45m' + "Element length (approximately): %f mm. ***" %real_element_length + '\x1b[0m')
 

@@ -84,7 +84,8 @@ def output_keyword_file(nodes_s, elements_s, pid, filename):
 
     # creating txt files (NEEDS TO BE FIXED)
     np.savetxt('nodes.txt', nodes_s, header="*KEYWORD\n*NODES", fmt="%i,%f,%f,%f", comments="")
-    np.savetxt('elements.txt', elements_s, header="*ELEMENT_SOLID", fmt="%8i%8i%8i%8i%8i%8i%8i%8i%8i%8i", comments="")
+    elem_fmt = ', '.join(['%d'] * elements_s.shape[1])
+    np.savetxt('elements.txt', elements_s, header="*ELEMENT_SOLID", fmt=elem_fmt, comments="")
 
     section(pid)
     #velocity = initial_velocity(pid, velocity, angle)
@@ -125,7 +126,8 @@ def output_include_file(nodes_s, elements_s, pid, filename):
 
     # creating txt files (NEEDS TO BE FIXED)
     np.savetxt('nodes.txt', nodes_s, header="*KEYWORD\n*NODES", fmt="%i,%f,%f,%f", comments="")
-    np.savetxt('elements.txt', elements_s, header="*ELEMENT_SOLID", fmt="%8i%8i%8i%8i%8i%8i%8i%8i%8i%8i", comments="")
+    elem_fmt = ', '.join(['%d'] * elements_s.shape[1])
+    np.savetxt('elements.txt', elem_fmt, header="*ELEMENT_SOLID", fmt=elem_fmt, comments="")
 
     #initial_velocity(pid, velocity, angle)
     #filenames = ['nodes.txt', 'elements.txt', 'initial_velocity.txt']
