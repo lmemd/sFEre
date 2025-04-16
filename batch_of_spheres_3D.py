@@ -11,7 +11,7 @@ def main():
     mean_radius = 1.4/2 # average radius of created sphere
     radius_std = 0.135/2 # standard deviation of radius for the created sphere
     spheres_number = 2 # total number of sphere created
-    spheres_batches = 20 # change this variable if you want to create more than one batch of shots
+    spheres_batches = 100 # change this variable if you want to create more than one batch of shots
 
     # Define FE length for spheres
     element_length = 0.04
@@ -55,6 +55,7 @@ def main():
                             mean_radius_setter=mean_radius,
                             radius_standard_deviation_setter=radius_std)
         spheres = stream.generate() # Create the stream
+        spheres_list.extend(spheres)
         
         # Change the filename according to current index of set number
         filename = f"{filename_to_export}{set_number + 1}"
@@ -66,22 +67,18 @@ def main():
         # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
         applied_velocity = apply_initial_velocity(filename, "Normal distribution", *(velocity, velocity_standard_deviation, minimum_velocity, maximum_velocity), angle = box_angle, dyna_id=1000000)
         velocities_list.append(applied_velocity)
-        spheres_list.extend(spheres)
 
         
-
+        
         # 3D plot of generated spheres        
-        #stream.plot_spheres(spheres_list)
+        stream.plot_spheres(spheres_list)
 
         #Calculate percentage of coverage
         shot_dents_radii = [impigment_diameter_calculation(sph.r,velocity)/2 for sph in spheres_list]
-
         centers = [(sph.x , sph.z) for sph in spheres_list]
         coverage = stream.calculate_coverage(centers,shot_dents_radii,0.01)
         coverage_list.append(coverage)
     
-
-    plt.hist(velocities_list,bins=10)
 
     plt.figure()
     transposed_data = np.transpose(coverage_list)
@@ -89,6 +86,8 @@ def main():
         plt.plot(item_group, label='Item {}'.format(i + 1))
 
     stream.plot_coverage(spheres_list,velocity)
+
+    visualize_velocity_distribution(velocities_list)
 
     plt.show()
     
