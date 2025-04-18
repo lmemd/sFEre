@@ -7,7 +7,7 @@ class sphere_2D(Shape):
         self.r = rr
 
     def __hash__(self)->int:
-        return hash((self.dim_x, self.dim_y, self.dim_y, self.r))
+        return hash((self.dim_x, self.dim_y, self.r))
     
     #overload to know if 2 2D spheres are the same
     def __eq__(self, other)->None:
