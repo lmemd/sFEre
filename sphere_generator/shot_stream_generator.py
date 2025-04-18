@@ -10,6 +10,57 @@ from sieve_analysis_tools import statistical_tools as st
 import sieve_analysis_tools.distributions as dist
 import sieve_analysis_tools.statistical_tools as st
 from .utilities import impigment_diameter_calculation,covered_area
+import open3d as o3d
+
+class Spheres3dDrawer:
+    _SingletonInstance = None
+        
+    def __init__(self, spheres):
+        self._spheres = spheres
+    
+    #make this class a Singleton class, only one instance can exist at anytime
+    def __new__(cls, spheres):
+        if cls._SingletonInstance is None:
+            cls._SingletonInstance = super(Spheres3dDrawer, cls).__new__(cls, spheres)
+            cls._SingletonInstance._spheres = spheres
+        return cls._SingletonInstance
+    
+    @property
+    def spheres(self):
+        return self._spheres
+    
+    @spheres.setter
+    def spheres(self, spheres):
+        if not isinstance(spheres, list):
+            raise TypeError("Spheres must be a list of sphere objects.")
+        if not all(isinstance(sphere, (sphere_2D, sphere_3D)) for sphere in spheres):
+            raise TypeError("All elements in the spheres list must be sphere_2D or sphere_3D objects.")
+        self._spheres = spheres
+
+    # draw spheres, default color is blue
+    def draw(self, color=(0, 0, 255)):
+        if not isinstance(color, tuple) or len(color) != 3:
+            print("Color must be a tuple or list of three values (R, G, B), color is set to blue by default.")
+            color = (0, 0, 255) # default blue color
+
+        # Create an array of Open3D geometries for each sphere
+        geometries = np.zeros((len(self.spheres),), dtype=o3d.geometry.TriangleMesh)
+        for i, sphere in enumerate(self.spheres):
+            mesh_sphere = o3d.geometry.TriangleMesh.create_sphere(radius=sphere.r)
+            
+            mesh_sphere.translate((sphere.x, sphere.y, sphere.z)) # translate the sphere to its position
+
+            mesh_sphere.compute_vertex_normals()
+            
+            mesh_sphere.paint_uniform_color(color) # Red color
+            
+            mesh_sphere.paint_uniform_color((color[0]/255, color[1]/255, color[2]/255)) # Normalize color values to [0, 1]
+
+            geometries[i] = mesh_sphere
+
+        #draw spheres
+        o3d.visualization.draw_geometries(geometries, window_name="3D spheres distribution", width=800, height=600, left=50, top=50, mesh_show_back_face=True)
+
 class shot_stream:
     """A class that describes the shot stream
 
@@ -236,6 +287,12 @@ class shot_stream:
             print('Coverage plot is only available in 3D spheres')
             return
         
+
+    def plot_spheres_v2(self, spheres, color=(0, 0, 255)):
+        sphereDrawer = Spheres3dDrawer(spheres)
+
+        #draw the spheres
+        sphereDrawer.draw(color) # default blue color
 
     def plot_spheres(self,spheres):
         """Plots the generated spheres, in space or in plane.

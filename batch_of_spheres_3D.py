@@ -87,6 +87,10 @@ def main():
     # 3D plot of generated spheres        
     stream.plot_spheres(spheres_list)
 
+    #if you want to try the new plot3d with huge rendering difference for big numbers of spheres
+    # new way of plotting 3D spheres
+    #stream.plot_spheres_v2(spheres_list, color=(0, 0, 255))
+
     plt.show()
     
     # Print the X,Y coordinates and the radii of created spheres
