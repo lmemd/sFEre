@@ -92,13 +92,11 @@ def output_keyword_file(nodes_s, elements_s, pid, filename):
 
     #filenames = ['nodes.txt', 'elements.txt', 'section.txt', 'material.txt', 'initial_velocity.txt']
     filenames = ['nodes.txt', 'elements.txt', 'section.txt', 'material.txt']
-    #if velocity:
-    #    merge_txt_files(filenames,'%s.k' %filename)
-    #else:
-    #    merge_txt_files(filenames[0:-1], '%s.k' %filename)
-    #    """with open('%s.k' %filename, "a+") as f:
-    #        f.write("*END")
-    #    f.close()""" # under investigation (if *END is needed at the end of the .k file)
+
+    merge_txt_files(filenames[0:-1], '%s.k' %filename)
+#    """with open('%s.k' %filename, "a+") as f:
+#        f.write("*END")
+#    f.close()""" # under investigation (if *END is needed at the end of the .k file)
 
     os.remove('nodes.txt')
     os.remove('elements.txt')
@@ -108,7 +106,7 @@ def output_keyword_file(nodes_s, elements_s, pid, filename):
 
 
 
-def output_include_file(nodes_s, elements_s, pid, filename):
+def output_include_file(nodes_s, elements_s, filename):
     """Same function as output_keyword_file, 
     but with the absence of property and material.
 
