@@ -1,5 +1,5 @@
-from reliability.Fitters import Fit_Weibull_Mixture, Fit_Everything, Fit_Normal_2P
-from reliability.Other_functions import histogram
+#from reliability.Fitters import Fit_Weibull_Mixture, Fit_Everything, Fit_Normal_2P
+#from reliability.Other_functions import histogram
 import numpy as np
 import matplotlib.pyplot as plt
 import math

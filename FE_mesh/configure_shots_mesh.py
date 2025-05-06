@@ -33,7 +33,7 @@ def mesh_interface(mesh_method, spacing_method, spheres, element_length, filenam
         nodes_all = np.reshape(np.zeros((1, 4)), (1, 4))
         elements_all = np.reshape(np.zeros((1, 9)), (1, 9))
         for s in spheres:
-            [nodes_s_tmp, elements_s_tmp] = sphere_entity(mesh_method, spacing_method, s.r, element_length, s.x, s.y, s.z, pid)
+            [nodes_s_tmp, elements_s_tmp] = sphere_entity(mesh_method, spacing_method, s.r, element_length, s.x, s.y, s.z)
             if len(spheres) > 1:
                 # renumber indexes of elements and nodes ids
                 nodes_s_tmp[:, 0] += np.shape(nodes_all)[0] - 1 # here we dont need + 1 
