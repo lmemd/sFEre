@@ -1,6 +1,6 @@
 from sphere_generator.sphere import sphere_3D
 from sphere_generator.shot_stream_generator import shot_stream
-from FE_mesh.configure_shots_mesh import *
+from FE_mesh.configure_shots_mesh import mesh_interface
 import os 
 
 def main():
@@ -21,8 +21,7 @@ def main():
 
     # Define FE mesh and spacing method
     sphere = shot_stream.single_sphere([x, y, z], radius)
-    (nodes, elements) = create_mesh_geometry("spherified_cube", "nonlinear", sphere, element_length, directory) # process and output of meshed generated spheres
-    export_mesh_geometry(nodes, elements, filename, "LSDYNA", pid = 1000000) #if you don't want to output geometry to a file, comment this
+    mesh_interface("spherified_cube", "nonlinear", sphere, element_length, filename, directory, output_option = "LSDYNA") # process and output of meshed generated spheres
 
     #Plot is not available for structured batches or single sphere
 

@@ -1,4 +1,4 @@
-from FE_mesh.configure_shots_mesh import *
+from FE_mesh.configure_shots_mesh import mesh_interface
 from FE_mesh.LSDYNA_keyword_manager import apply_initial_velocity
 from sphere_generator.shot_stream_generator import shot_stream
 from sphere_generator.utilities import *
@@ -10,8 +10,8 @@ def main():
     filename_to_export = "S460_shots_75_90_No" # name of sphere file
     mean_radius = 1/2 # average radius of created sphere
     radius_std = 0.135/2 # standard deviation of radius for the created sphere
-    spheres_number = 2 # total number of sphere created
-    spheres_batches = 10 # change this variable if you want to create more than one batch of shots
+    spheres_number = 30 # total number of sphere created
+    spheres_batches = 1 # change this variable if you want to create more than one batch of shots
 
     # Define FE length for spheres
     element_length = 0.04
@@ -65,12 +65,12 @@ def main():
         
         # Define FE mesh and spacing method
         # process and output of meshed generated spheres
-        (nodes, elements) = create_mesh_geometry("spherified_cube", "nonlinear", spheres, element_length, directory, pid = 1000000, renumbering_point=10000000)
-        export_mesh_geometry(nodes, elements, filename, "LSDYNA", pid = 1000000) #if you don't want to output geometry to a file, comment this
+        #(nodes, elements) = create_mesh_geometry("spherified_cube", "nonlinear", spheres, element_length, directory, pid = 1000000, renumbering_point=10000000)
+        #export_mesh_geometry(nodes, elements, filename, "LSDYNA", pid = 1000000) #if you don't want to output geometry to a file, comment this
 
         # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
-        applied_velocity = apply_initial_velocity(filename, "Normal distribution", *(velocity, velocity_standard_deviation, minimum_velocity, maximum_velocity), angle = box_angle, dyna_id=1000000)
-        velocities_list.append(applied_velocity)
+        #applied_velocity = apply_initial_velocity(filename, "Normal distribution", *(velocity, velocity_standard_deviation, minimum_velocity, maximum_velocity), angle = box_angle, dyna_id=1000000)
+        #velocities_list.append(applied_velocity)
 
         #Calculate percentage of coverage
         shot_dents_radii = [impigment_diameter_calculation(sph.r,velocity)/2 for sph in spheres_list]
@@ -86,14 +86,7 @@ def main():
 
     stream.plot_coverage(spheres_list,velocity)
 
-    visualize_velocity_distribution(velocities_list)    
-        
-    # 3D plot of generated spheres        
-    stream.plot_spheres(spheres_list)
-
-    #if you want to try the new plot3d with huge rendering difference for big numbers of spheres
-    # new way of plotting 3D spheres
-    #stream.plot_spheres_v2(spheres_list, color=(0, 0, 255))
+    visualize_velocity_distribution(velocities_list)
 
     plt.show()
     

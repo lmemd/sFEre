@@ -1,4 +1,4 @@
-from FE_mesh.configure_shots_mesh import *
+from FE_mesh.configure_shots_mesh import mesh_interface
 from FE_mesh.LSDYNA_keyword_manager import apply_initial_velocity
 from sphere_generator.shot_stream_generator import shot_stream
 from sphere_generator.utilities import *
@@ -77,10 +77,6 @@ def main():
     problem_dimensions = problem_dimensions_setter("3D") # Input 2D or 3D according to your problem dimensions
     box = box_getter(problem_dimensions,box_width,box_height,box_length) # create the box 
 
-    #if just Shape, exit function
-    if not isinstance(box, Box_2D) and not isinstance(box, Box_3D):
-        return
-
     #***********************************END OF INPUT SECTION**************************************
     coverage_list = []
     spheres_list = [] # initialize empty spheres list
@@ -101,8 +97,7 @@ def main():
         
         # Define FE mesh and spacing method
         # process and output of meshed generated spheres
-        (nodes, elements) = create_mesh_geometry("spherified_cube", "nonlinear", spheres, element_length, directory, pid = 1000000, renumbering_point=1000000)
-        export_mesh_geometry(nodes, elements, filename, "LSDYNA", pid = 1000000) #if you don't want to output geometry to a file, comment this
+       # mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA-entities", pid = 1000000, renumbering_point=1000000)
 
         # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
         # Currently, an absolute initial velocity of 70 m/s will be applied.

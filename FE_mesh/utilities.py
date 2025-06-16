@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 
 def working_directory(path):   
     if not os.path.exists(path):
-        os.mkdir(path)
+        os.mkdir(path)   
+    
     os.chdir(path)
 
 
@@ -26,8 +27,7 @@ def merge_txt_files(filenames_list, final_output_filename, delete_temp = False):
         outfile.close()
     if delete_temp:
         for f in filenames_list:
-            if os.path.exists(f):
-                os.remove(f)
+            os.remove(f)
 
 
 def plot_grid(grid):
