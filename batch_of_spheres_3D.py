@@ -7,10 +7,10 @@ from sieve_analysis_tools import sieve_analysis_evaluation as s
 
 def main():
     #**************************************INPUT SECTION******************************************
-    filename_to_export = "S460_shots_75_90_No" # name of sphere file
-    mean_radius = 1/2 # average radius of created sphere
+    filename_to_export = "ABQTEST" # name of sphere file
+    mean_radius = 1.4/2 # average radius of created sphere
     radius_std = 0.135/2 # standard deviation of radius for the created sphere
-    spheres_number = 30 # total number of sphere created
+    spheres_number = 1 # total number of sphere created
     spheres_batches = 1 # change this variable if you want to create more than one batch of shots
 
     # Define FE length for spheres
@@ -18,14 +18,14 @@ def main():
 
     # Initial velocity applied m/s and velocity configuration
     velocity = 75 
-    velocity_standard_deviation = 0
+    velocity_standard_deviation = 5
     maximum_velocity = velocity
     minimum_velocity = 65
 
     # Define the domain characteristics (the space that contains the created spheres)
-    box_width = 2 # width of the domain containing the spheres (alongside X axis)
-    box_length = 2 # length of the domain containing the spheres (alongside Z axis)
-    box_height = 10000000 # height of the domain containing the spheres (alongside Y axis)
+    box_width = 3 # width of the domain containing the spheres (alongside X axis)
+    box_length = 3 # length of the domain containing the spheres (alongside Z axis)
+    box_height = 20 # height of the domain containing the spheres (alongside Y axis)
     box_angle = 90 # change this value if you want an inlcined box (defined by the angle between the box and the XZ plane)
 
     parent_dir = os.getcwd()
@@ -39,9 +39,6 @@ def main():
 
     problem_dimensions = problem_dimensions_setter("3D") # Input 2D or 3D according to your problem dimensions
     box = box_getter(problem_dimensions,box_width,box_height,box_length) # create the box 
-
-    print(box.dim_y, box.dim_x, box.dim_z)
-    print(box)
 
     #***********************************END OF INPUT SECTION**************************************
 
@@ -65,12 +62,19 @@ def main():
         
         # Define FE mesh and spacing method
         # process and output of meshed generated spheres
-        #(nodes, elements) = create_mesh_geometry("spherified_cube", "nonlinear", spheres, element_length, directory, pid = 1000000, renumbering_point=10000000)
-        #export_mesh_geometry(nodes, elements, filename, "LSDYNA", pid = 1000000) #if you don't want to output geometry to a file, comment this
-
+        
+        #mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA-entities", pid = 10000000, renumbering_point=10000000)
+        mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "ABAQUS", pid = 1000, renumbering_point=1000)
+        mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "general", pid = 1000, renumbering_point=1000)
+        mesh_interface("spherified_cube", "nonlinear", spheres, element_length, filename, directory, "LSDYNA-entities", pid = 1000, renumbering_point=1000)
         # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
-        #applied_velocity = apply_initial_velocity(filename, "Normal distribution", *(velocity, velocity_standard_deviation, minimum_velocity, maximum_velocity), angle = box_angle, dyna_id=1000000)
-        #velocities_list.append(applied_velocity)
+        applied_velocity = apply_initial_velocity(filename, "Normal distribution", *(velocity, velocity_standard_deviation, minimum_velocity, maximum_velocity), angle = box_angle, dyna_id=1000000)
+        velocities_list.append(applied_velocity)
+
+        
+        
+        # 3D plot of generated spheres        
+        stream.plot_spheres(spheres_list)
 
         #Calculate percentage of coverage
         shot_dents_radii = [impigment_diameter_calculation(sph.r,velocity)/2 for sph in spheres_list]
