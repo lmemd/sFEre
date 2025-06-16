@@ -8,7 +8,7 @@ from sieve_analysis_tools import sieve_analysis_evaluation as s
 def main():
     #**************************************INPUT SECTION******************************************
     filename_to_export = "ABQTEST" # name of sphere file
-    mean_radius = 1.4/2 # average radius of created sphere
+    mean_radius = 1./2 # average radius of created sphere
     radius_std = 0.135/2 # standard deviation of radius for the created sphere
     spheres_number = 1 # total number of sphere created
     spheres_batches = 1 # change this variable if you want to create more than one batch of shots
