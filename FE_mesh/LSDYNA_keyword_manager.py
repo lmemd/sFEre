@@ -1,6 +1,6 @@
 import numpy as np
 import os
-from FE_mesh.utilities import working_directory, merge_txt_files
+from FE_mesh.utilities import merge_txt_files
 from sieve_analysis_tools import velocity_stochasticity as vs
 
 def section(PID, MID = 1000000, ELFORM = 1):
@@ -98,13 +98,9 @@ def output_keyword_file(nodes_s, elements_s, pid, filename):
 #        f.write("*END")
 #    f.close()""" # under investigation (if *END is needed at the end of the .k file)
 
-    os.remove('nodes.txt')
-    os.remove('elements.txt')
-    os.remove('section.txt')
-    os.remove('material.txt')
-    os.remove('initial_velocity.txt')
-
-
+    for fname in filenames:
+        if os.path.exists(fname):
+            os.remove(fname)
 
 def output_include_file(nodes_s, elements_s, filename):
     """Same function as output_keyword_file, 
@@ -132,9 +128,9 @@ def output_include_file(nodes_s, elements_s, filename):
     filenames = ['nodes.txt', 'elements.txt']
     merge_txt_files(filenames, '%s.k' %filename)
 
-    os.remove('nodes.txt')
-    os.remove('elements.txt')
-    os.remove('initial_velocity.txt')
+    for fname in filenames:
+        if os.path.exists(fname):
+            os.remove(fname)
 
     #changing path in order to produce multiple batches
     os.chdir(change_path)
@@ -169,8 +165,9 @@ def output_general_file(nodes_s, elements_s, filename, ending = ".txt"):
     filenames = ['nodes.txt', 'elements.txt']
     merge_txt_files(filenames, '%s%s' %(filename, ending))
 
-    os.remove('nodes.txt')
-    os.remove('elements.txt')
+    for fname in filenames:
+        if os.path.exists(fname):
+            os.remove(fname)
 
     #changing path in order to produce multiple batches
     os.chdir(change_path)
@@ -181,7 +178,7 @@ def apply_initial_velocity(filename, velocity_stochasticity_option, *velocity_ar
 
     Args:
         filename (str): Name of the output LS-DYNA file.
-        velocity_stochasticity_option (str): The type of stochasticity to apply to the initial velocity. Valid options are "Normal distribution", "Mixed random"
+        velocity_stochasticity_option (str): The type of stochasticity to apply to the initial velocity. Valid options are "Normal distribution", "Mixed random", "Constant"
         stochasticity_args (tuple): The arguments to be passed to the stochasticity function.
         angle (float): The impact angle to apply.
         pid (int): The process ID for the LS-DYNA file.
