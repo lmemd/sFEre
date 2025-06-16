@@ -1,4 +1,5 @@
-from .box import Box, Box_2D, Box_3D
+from .shape import Shape
+from .box import Box_2D, Box_3D
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -32,7 +33,7 @@ def problem_dimensions_setter(dimensions : str)->int:
     else:
         raise Exception('Please input 2D for a two-dimensional problem and 3D for a three-dimensional problem')
 
-def box_getter(integer_dimensions : int, box_width : float, box_height : float, box_length : float = None)->Box:
+def box_getter(integer_dimensions : int, box_width : float, box_height : float, box_length : float = None)->Shape:
     """Get the box in the specified dimensions
 
     Args:
@@ -57,8 +58,7 @@ def box_getter(integer_dimensions : int, box_width : float, box_height : float, 
     elif integer_dimensions == 2:
         return Box_2D(box_width,box_height)
     else:
-        #return generic Box (not implemented)
-        return Box(box_width, box_height, box_length)
+        return Shape(box_width, box_height, box_length) #return Shape 
     
 def impigment_diameter_calculation(radius,velocity=None):
     """
@@ -106,19 +106,15 @@ def covered_area(circle_centers,dents_radii,surface_width, surface_height,resolu
 
     # Create the grid and the 2D array
     X, Y = np.meshgrid(grid_points_width, grid_points_height)
-    grid_array = np.zeros((grid_size_height, grid_size_width))
+    grid_array = np.zeros_like(X, dtype=int)
 
-    # Iterate over each grid point
-    for i in range(grid_size_height):
-        for j in range(grid_size_width):
-            x = X[i, j]
-            y = Y[i, j]
-            
-            # Check if the point lies within any of the circles
-            for k, center in enumerate(circle_centers):
-                radius = dents_radii[k]
-                if np.sqrt((x - center[0])**2 + (y - center[1])**2) <= radius:
-                    grid_array[i, j] += 1
+    '''Vectorized version
+    Iterates over every grid point and checks if the points lies
+    withing any of the given circles'''
+    for k, center in enumerate(circle_centers):
+        radius = dents_radii[k]
+        distance_squared = ((X - center[0]) ** 2 + (Y - center[1]) ** 2)
+        grid_array += (distance_squared <= radius ** 2).astype(int)
 
     thresholds = [ 1, 2, 3, 4, 5, 6]  # Threshold values
 
@@ -164,5 +160,5 @@ def visualize_velocity_distribution(velocities):
     plt.xlabel('Impact velocities')
     plt.ylim(0, 100)
     plt.grid()
-    plt.show()
+
 
