@@ -179,7 +179,7 @@ class shot_stream:
 
         return spheres
 
-    def generate(self):
+    def generate(self, intersection_flag = True):
         """Generates a shot stream according to the given attributes. The spheres are not allowed to intersect.
 
             Returns:
@@ -222,6 +222,10 @@ class shot_stream:
                 
                 #check if size criteria are satisfied
                 intersection = self.intersects_existing(s,spheres)
+                
+                if intersection_flag == False:
+                    intersection = False
+
                 if not intersection:
                     spheres_counter += 1
                     spheres.append(s) #add the created sphere to the list
