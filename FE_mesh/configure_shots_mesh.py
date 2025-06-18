@@ -3,6 +3,7 @@ import sys
 import sphere_generator
 from FE_mesh.configure_sphere_entity import sphere_entity
 from FE_mesh.LSDYNA_keyword_manager import output_keyword_file, output_general_file
+from FE_mesh.ABAQUS_keyword_manager import output_inp_file_entities
 from FE_mesh.utilities import working_directory
 
 #call this if you want the mesh to be exported to a file
@@ -22,6 +23,8 @@ def export_mesh_geometry(nodes, elements, filename, output_option, pid, mid):
         output_keyword_file(nodes, elements, pid, mid, filename)
     elif output_option == "LSDYNA-entities":
         output_keyword_file(nodes, elements, pid, mid, filename, apply_property=False)
+    elif output_option == "ABAQUS":
+        output_inp_file_entities(nodes,elements,pid,mid,filename)
     else:
         print("Please choose a valid output option: general, LSDYNA or LSDYNA-entities.")
 
@@ -52,6 +55,7 @@ def create_mesh_geometry(mesh_method, spacing_method, spheres, element_length, o
 
     nodes_all = np.reshape(np.zeros((1, 4)), (1, 4))
     elements_all = np.reshape(np.zeros((1, 9)), (1, 9))
+
     for s in spheres:
         [nodes_s_tmp, elements_s_tmp] = sphere_entity(mesh_method, spacing_method, s.r, element_length, s.x, s.y, s.z)
 
