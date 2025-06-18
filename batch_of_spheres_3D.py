@@ -10,8 +10,8 @@ def main():
     filename_to_export = "ABQTEST" # name of sphere file
     mean_radius = 1./2 # average radius of created sphere
     radius_std = 0.135/2 # standard deviation of radius for the created sphere
-    spheres_number = 2 # total number of sphere created
-    spheres_batches = 10 # change this variable if you want to create more than one batch of shots
+    spheres_number = 1 # total number of sphere created
+    spheres_batches = 1 # change this variable if you want to create more than one batch of shots
 
     # Define FE length for spheres
     element_length = 0.04
@@ -62,8 +62,8 @@ def main():
         
         # Define FE mesh and spacing method
         # process and output of meshed generated spheres
-        (nodes, elements) = create_mesh_geometry("spherified_cube", "nonlinear", spheres, element_length, directory, pid = 1000000, renumbering_point=10000000)
-        export_mesh_geometry(nodes, elements, filename, "LSDYNA", pid = 1000000) #if you don't want to output geometry to a file, comment this
+        (nodes, elements) = create_mesh_geometry("spherified_cube", "nonlinear", spheres, element_length, directory, renumbering_point=10000000)
+        export_mesh_geometry(nodes, elements, filename, "LSDYNA", pid = 1000000, mid = 10000) #if you don't want to output geometry to a file, comment this
 
         # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
         applied_velocity = apply_initial_velocity(filename, "Normal distribution", *(velocity, velocity_standard_deviation, minimum_velocity, maximum_velocity), angle = box_angle, dyna_id=1000000)

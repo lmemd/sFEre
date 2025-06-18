@@ -3,7 +3,7 @@ import os
 from FE_mesh.utilities import merge_txt_files
 from sieve_analysis_tools import velocity_stochasticity as vs
 
-def section(PID, MID = 1000000, ELFORM = 1):
+def section(PID, MID, ELFORM = 1):
     """This function defines a section, which 
     is needed for LS - DYNA keyword file format.
 
@@ -14,7 +14,7 @@ def section(PID, MID = 1000000, ELFORM = 1):
     """
     with open('section.txt', 'w') as outfile1, open('material.txt', 'w') as outfile2:
         outfile1.write("*PART" +  '\n' + 'SECTION_SOLID' + '\n')
-        outfile1.write('  %d' %PID + ',    '+ '%d' %MID + ',    ' + '%d' %MID + ',    ' + '0,    0,    0,    0,    0,    0,    %d'%ELFORM + '\n')
+        outfile1.write('  %d' %PID + ',    '+ '%d' %PID + ',    ' + '%d' %MID + ',    ' + '0,    0,    0,    0,    0,    0,    %d'%ELFORM + '\n')
 
         outfile1.write("*SECTION_SOLID_TITLE" +  '\n' + 'SECTION_SOLID' + '\n')
         outfile1.write('  %d' %PID + ',    '+ '%d' %MID + '\n')
@@ -65,7 +65,7 @@ def initial_velocity(PID, velocity, angle):
     return variable
 
 
-def output_keyword_file(nodes_s, elements_s, pid, filename):
+def output_keyword_file(nodes_s, elements_s, pid, mid, filename, apply_property = True):
     """Function which outputs the final keyword file
     including sphere entity.
 
@@ -73,6 +73,7 @@ def output_keyword_file(nodes_s, elements_s, pid, filename):
         nodes_s (array): Nodes matrix.
         elements_s (array): Elements matrix.
         pid (int): Described before.
+        mid (int): Material ID
         filename (string): Final output name.
         output_path (string): The final output directory
         velocity (float): Initial velocity of spheres.
@@ -81,59 +82,27 @@ def output_keyword_file(nodes_s, elements_s, pid, filename):
     change_path = os.getcwd()
     os.chdir(change_path)
     os.chdir(change_path)
+   
+    #insert the column for the PID 
+    pid_column = np.full((elements_s.shape[0],), pid)
+    elements_s_new = np.insert(elements_s, 1, pid_column, axis=1)
 
     # creating txt files (NEEDS TO BE FIXED)
+    np.savetxt('elements.txt', elements_s_new, header="*ELEMENT_SOLID", fmt="%8i%8i%8i%8i%8i%8i%8i%8i%8i%8i", comments="")
     np.savetxt('nodes.txt', nodes_s, header="*KEYWORD\n*NODES", fmt="%i,%f,%f,%f", comments="")
-    elem_fmt = ', '.join(['%d'] * elements_s.shape[1])
-    np.savetxt('elements.txt', elements_s, header="*ELEMENT_SOLID", fmt=elem_fmt, comments="")
-
-    section(pid)
-    #velocity = initial_velocity(pid, velocity, angle)
-
-    #filenames = ['nodes.txt', 'elements.txt', 'section.txt', 'material.txt', 'initial_velocity.txt']
-    filenames = ['nodes.txt', 'elements.txt', 'section.txt', 'material.txt']
-
-    merge_txt_files(filenames[0:-1], '%s.k' %filename)
-#    """with open('%s.k' %filename, "a+") as f:
-#        f.write("*END")
-#    f.close()""" # under investigation (if *END is needed at the end of the .k file)
-
-    for fname in filenames:
-        if os.path.exists(fname):
-            os.remove(fname)
-
-def output_include_file(nodes_s, elements_s, filename):
-    """Same function as output_keyword_file, 
-    but with the absence of property and material.
-
-    Args:
-        nodes_s (array): Nodes matrix.
-        elements_s (array): Elements matrix.
-        pid (int): Described before.
-        filename (string): Final output name.
-        velocity (float): Initial velocity of spheres.
-        angle (float): Impact angle.
-    """
-    change_path = os.getcwd()
-    os.chdir(change_path)
-    os.chdir(change_path)
-
-    # creating txt files (NEEDS TO BE FIXED)
-    np.savetxt('nodes.txt', nodes_s, header="*KEYWORD\n*NODES", fmt="%i,%f,%f,%f", comments="")
-    elem_fmt = ', '.join(['%d'] * elements_s.shape[1])
-    np.savetxt('elements.txt', elem_fmt, header="*ELEMENT_SOLID", fmt=elem_fmt, comments="")
-
-    #initial_velocity(pid, velocity, angle)
-    #filenames = ['nodes.txt', 'elements.txt', 'initial_velocity.txt']
-    filenames = ['nodes.txt', 'elements.txt']
+    
+    if apply_property:
+        section(pid,mid)
+        filenames = ['nodes.txt', 'elements.txt', 'section.txt', 'material.txt']
+    else:
+        filenames = ['nodes.txt', 'elements.txt']
+        
     merge_txt_files(filenames, '%s.k' %filename)
 
+    #remove the temporary .txt files
     for fname in filenames:
         if os.path.exists(fname):
             os.remove(fname)
-
-    #changing path in order to produce multiple batches
-    os.chdir(change_path)
 
 
 def output_general_file(nodes_s, elements_s, filename, ending = ".txt"):
