@@ -16,6 +16,10 @@ def main():
     # Define FE length for spheres
     element_length = 0.04
 
+    #Define material and properties for FE solver
+    PID = 100000
+    MID = 100000
+
     # Initial velocity applied m/s and velocity configuration
     velocity = 75 
     velocity_standard_deviation = 5
@@ -42,9 +46,8 @@ def main():
 
     #***********************************END OF INPUT SECTION**************************************
 
-    spheres_list = [] # initialize empty spheres list
-    coverage_list = []
-    velocities_list = []
+    spheres_list, coverage_list, velocities_list = [], [], [] # initialize empty spheres list
+
     for set_number in range(spheres_batches):
 
         # Generate stream of random distributed shots in space
@@ -63,12 +66,18 @@ def main():
         # Define FE mesh and spacing method
         # process and output of meshed generated spheres
         (nodes, elements) = create_mesh_geometry("spherified_cube", "nonlinear", spheres, element_length, directory, renumbering_point=10000000)
-        export_mesh_geometry(nodes, elements, filename, "LSDYNA", pid = 1000000, mid = 10000) #if you don't want to output geometry to a file, comment this
-        #export_mesh_geometry(nodes, elements, filename, "ABAQUS", pid = 1000000, mid = 10000) #if you don't want to output geometry to a file, comment this
+
+        #Output the entities in selected solver format
+        export_mesh_geometry(nodes, elements, filename, "LSDYNA", PID, MID) #if you don't want to output geometry to a file, comment this
+        #export_mesh_geometry(nodes, elements, filename, "ABAQUS", PID, MID) #if you don't want to output geometry to a file, comment this
 
         # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
-        applied_velocity = apply_initial_velocity(filename, "Normal distribution", *(velocity, velocity_standard_deviation, minimum_velocity, maximum_velocity), angle = box_angle, dyna_id=1000000)
+        applied_velocity = apply_initial_velocity(filename, "Normal distribution", 
+                                                  *(velocity, velocity_standard_deviation, minimum_velocity, maximum_velocity), 
+                                                  angle = box_angle, dyna_id=PID)
+        
         velocities_list.append(applied_velocity)
+
 
         #Calculate percentage of coverage
         shot_dents_radii = [impigment_diameter_calculation(sph.r,velocity)/2 for sph in spheres_list]
@@ -76,21 +85,24 @@ def main():
         coverage = stream.calculate_coverage(centers,shot_dents_radii,0.01)
         coverage_list.append(coverage)
     
+    #Plots
 
     plt.figure()
     transposed_data = np.transpose(coverage_list)
     for i, item_group in enumerate(transposed_data):
         plt.plot(item_group, label='Item {}'.format(i + 1))
 
+    #Plot covered area
     stream.plot_coverage(spheres_list,velocity)
 
+    #Plot velocity distributions
     visualize_velocity_distribution(velocities_list)    
         
     # 3D plot of generated spheres        
     stream.plot_spheres(spheres_list)
 
     #if you want to try the new plot3d with huge rendering difference for big numbers of spheres
-    # new way of plotting 3D spheres
+    # new way of plotting 3D spheres, DOESN'T WORK!!!!
     #stream.plot_spheres_v2(spheres_list, color=(0, 0, 255))
 
     plt.show()

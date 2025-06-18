@@ -11,6 +11,7 @@ def output_inp_file_entities(nodes_s, elements_s, pid, mid, filename):
         nodes_s (array): Nx4 array [node_id, x, y, z].
         elements_s (array): Mx9 array [elem_id, node1, node2, ..., node8].
         pid (int): Part ID (can be used for material/section assignment).
+        mid (int): Material ID
         filename (str): Output filename (without .inp extension).
     """
     
@@ -44,7 +45,7 @@ def output_inp_file_entities(nodes_s, elements_s, pid, mid, filename):
     os.chdir(change_path)
 
 
-def section(PID, MID = 1000000, ELFORM = 1):
+def section(PID, MID = 1000000):
     """This function defines a section, which 
     is needed for LS - DYNA keyword file format.
 
