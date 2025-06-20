@@ -1,5 +1,6 @@
 from FE_mesh.configure_shots_mesh import *
 from FE_mesh.LSDYNA_keyword_manager import apply_initial_velocity
+from FE_mesh.ABAQUS_keyword_manager import creat_abq_set
 from sphere_generator.shot_stream_generator import shot_stream
 from sphere_generator.utilities import *
 import os
@@ -10,7 +11,7 @@ def main():
     filename_to_export = "ABQTEST" # name of sphere file
     mean_radius = 1./2 # average radius of created sphere
     radius_std = 0.135/2 # standard deviation of radius for the created sphere
-    spheres_number = 20 # total number of sphere created
+    spheres_number = 1 # total number of sphere created
     spheres_batches = 1 # change this variable if you want to create more than one batch of shots
 
     # Define FE length for spheres
@@ -19,6 +20,7 @@ def main():
     #Define material and properties for FE solver
     PID = 100000
     MID = 100000
+    solver = 'ABAQUS'
 
     # Initial velocity applied m/s and velocity configuration
     velocity = 75 
@@ -59,7 +61,7 @@ def main():
                             radius_standard_deviation_setter=radius_std)
         
         #Set the intersection_flag to True, if you don't want any intersections between spheres
-        spheres = stream.generate(intersection_flag=False) # Create the stream
+        spheres = stream.generate(intersection_flag=True) # Create the stream
         spheres_list.extend(spheres)
         
         # Change the filename according to current index of set number
@@ -70,9 +72,8 @@ def main():
         (nodes, elements) = create_mesh_geometry("spherified_cube", "nonlinear", spheres, element_length, directory, renumbering_point=10000000)
 
         #Output the entities in selected solver format
-        export_mesh_geometry(nodes, elements, filename, "LSDYNA", PID, MID) #if you don't want to output geometry to a file, comment this
-        #export_mesh_geometry(nodes, elements, filename, "ABAQUS", PID, MID) #if you don't want to output geometry to a file, comment this
-
+        export_mesh_geometry(nodes, elements, filename, solver, PID, MID) #if you don't want to output geometry to a file, comment this
+        
         # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
         applied_velocity = apply_initial_velocity(filename, "Normal distribution", 
                                                   *(velocity, velocity_standard_deviation, minimum_velocity, maximum_velocity), 
