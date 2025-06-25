@@ -152,5 +152,61 @@ def initial_velocity(NSET, velocity, angle):
 
     return variable
 
+def apply_initial_velocity(filename, velocity_stochasticity_option, *velocity_args, angle, dyna_id = 1):
+    """Applies (or not) initial velocity to sphere entities in an LS-DYNA file.
+
+    Args:
+        filename (str): Name of the output LS-DYNA file.
+        velocity_stochasticity_option (str): The type of stochasticity to apply to the initial velocity. Valid options are "Normal distribution", "Mixed random", "Constant"
+        stochasticity_args (tuple): The arguments to be passed to the stochasticity function.
+        angle (float): The impact angle to apply.
+        pid (int): The process ID for the LS-DYNA file.
+
+    Raises:
+        TypeError: If user_initial_velocity is not False, float, or int.
+
+    Notes:
+        - This function modifies the LS-DYNA file at `filename` to apply the specified initial velocity and angle to any sphere entities.
+        - If `user_initial_velocity` is False, no velocity is applied.
+        - If `user_initial_velocity` is a float or int, it will be used directly as the initial velocity.
+        - If `velocity_stochasticity_option` is "Normal distribution", the `vs.normally_distributed_velocity()` function will be used to apply a normally-distributed stochastic velocity.
+        - If `velocity_stochasticity_option` is "Mixed random", the `vs.mixed_random_velocities()` function will be used to apply mixed random velocities.
+        - If `velocity_stochasticity_option` is "Constant" will be applied a constant velocity, defined by the user input.
+    """
+    change_path = os.getcwd()
+    os.chdir(change_path)
+        
+    #feature for application of stochastic velocity to the stream added
+    if velocity_stochasticity_option == "Normal distribution":
+        user_initial_velocity = vs.normally_distributed_velocity(*velocity_args)
+        print("applied velocity: ", user_initial_velocity)
+    
+    elif velocity_stochasticity_option == "Mixed random":
+        user_initial_velocity = vs.mixed_random_velocities(*velocity_args)
+        print("applied velocity: ", user_initial_velocity)
+    
+    elif velocity_stochasticity_option == "Constant":
+        user_initial_velocity = velocity_args[0]
+        print("applied velocity: ", user_initial_velocity)
+    
+    else:
+        pass
+        #print("Arguments for initial velocity stochasticity not found, constant velocity applied: ", user_initial_velocity)
+
+
+    if os.path.exists(f"{filename}.inp"):
+        initial_velocity(dyna_id, user_initial_velocity, angle)
+        with open("initial_velocity.txt", "r+") as f:
+            text = f.read()
+        f.close()
+        with open(f"{filename}.inp", "a+") as fout:
+            fout.write(text)
+        fout.close()
+        
+        os.remove("initial_velocity.txt")
+    else:
+        print("Initial velocity can only be applied for LS-DYNA file forms.")
+  
+    return user_initial_velocity
 
 

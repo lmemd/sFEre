@@ -165,9 +165,6 @@ def apply_initial_velocity(filename, velocity_stochasticity_option, *velocity_ar
     """
     change_path = os.getcwd()
     os.chdir(change_path)
-    
-    #user_initial_velocity = velocity_args[0]
-    #if isinstance(user_initial_velocity, (float, int)) and not user_initial_velocity == True or not user_initial_velocity:
         
     #feature for application of stochastic velocity to the stream added
     if velocity_stochasticity_option == "Normal distribution":
@@ -195,22 +192,11 @@ def apply_initial_velocity(filename, velocity_stochasticity_option, *velocity_ar
         with open(f"{filename}.k", "a+") as fout:
             fout.write(text)
         fout.close()
-
-        """with open(f"{filename}.k", "r+") as fout:
-            text = fout.read()
-            if "*END" in text:
-                text = text.replace("*END", lines)
-        fout.close()
-        with open(f"{filename}.k", "w+") as fout:
-            fout.write(text)
-        fout.close()""" # under investigation (if *END is needed at the end of the .k file)
         
         os.remove("initial_velocity.txt")
     else:
         print("Initial velocity can only be applied for LS-DYNA file forms.")
-
-    
+  
     return user_initial_velocity
-    #else:
-    #    raise TypeError("initial_velocity should be set as False or int/float!")
+
 

@@ -24,7 +24,7 @@ def export_mesh_geometry(nodes, elements, filename, output_option, pid, mid):
     elif output_option == "LSDYNA-entities":
         output_keyword_file(nodes, elements, pid, mid, filename, apply_property=False)
     elif output_option == "ABAQUS":
-        output_inp_file_entities(nodes,elements,pid,mid,filename)
+        output_inp_file_entities(nodes, elements, pid, mid, filename)
     else:
         print("Please choose a valid output option: general, LSDYNA or LSDYNA-entities.")
 
