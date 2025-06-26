@@ -336,7 +336,7 @@ class shot_stream:
             ax.set_xlim(-box.dim_x/2, box.dim_x/2)
             ax.set_ylim(0, box.dim_y)
             ax.set_zlim(-box.dim_z/2, box.dim_z/2)
-            ax.set_box_aspect((1,1,1))  # set the aspect ratio to be equal
+            ax.set_box_aspect((box.dim_x,box.dim_y,box.dim_z))  # set the aspect ratio to be equal
             
             # Set axis labels and display plot
             ax.set_xlabel('X')

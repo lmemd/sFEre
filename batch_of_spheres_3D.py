@@ -8,10 +8,10 @@ from sieve_analysis_tools import sieve_analysis_evaluation as s
 
 def main():
     #**************************************INPUT SECTION******************************************
-    filename_to_export = "ABQTEST" # name of sphere file
+    filename_to_export = "S330_75_batch_no_int_No" # name of sphere file
     mean_radius = 1./2 # average radius of created sphere
     radius_std = 0.135/2 # standard deviation of radius for the created sphere
-    spheres_number = 1 # total number of sphere created
+    spheres_number = 55 # total number of sphere created
     spheres_batches = 1 # change this variable if you want to create more than one batch of shots
 
     # Define FE length for spheres
@@ -20,18 +20,18 @@ def main():
     #Define material and properties for FE solver
     PID = 100000
     MID = 100000
-    solver = 'ABAQUS'
+    solver = 'LSDYNA'
 
     # Initial velocity applied m/s and velocity configuration
     velocity = 75 
-    velocity_standard_deviation = 5
+    velocity_standard_deviation = 0
     maximum_velocity = velocity
-    minimum_velocity = 65
+    minimum_velocity = 75
 
     # Define the domain characteristics (the space that contains the created spheres)
-    box_width = 3 # width of the domain containing the spheres (alongside X axis)
-    box_length = 3 # length of the domain containing the spheres (alongside Z axis)
-    box_height = 3 # height of the domain containing the spheres (alongside Y axis)
+    box_width = 2.5 # width of the domain containing the spheres (alongside X axis)
+    box_length = 2.5 # length of the domain containing the spheres (alongside Z axis)
+    box_height = 15. # height of the domain containing the spheres (alongside Y axis)
     box_angle = 90 # change this value if you want an inlcined box (defined by the angle between the box and the XZ plane)
 
     parent_dir = os.getcwd()
@@ -75,7 +75,7 @@ def main():
         export_mesh_geometry(nodes, elements, filename, solver, PID, MID) #if you don't want to output geometry to a file, comment this
         
         # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
-        applied_velocity = apply_initial_velocity(filename, "Normal distribution", 
+        applied_velocity = apply_initial_velocity(filename, "Constant", 
                                                   *(velocity, velocity_standard_deviation, minimum_velocity, maximum_velocity), 
                                                   angle = box_angle, dyna_id=PID)
         
