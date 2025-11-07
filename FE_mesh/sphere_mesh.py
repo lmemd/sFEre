@@ -4,7 +4,7 @@
 3. Mesh quality criteria should be created
 '''
 import numpy as np
-#import numpy_indexed as npi
+import numpy_indexed as npi
 
 from numpy.lib.twodim_base import mask_indices
 
@@ -366,7 +366,7 @@ def renumbering_element_pairs(old_nodes_id, sorted_nodes_id, elements_matrix):
     """
     mapping = dict(zip(old_nodes_id, sorted_nodes_id))
     #CHANGE FROM npi TO np
-    elements_matrix = np.remap(elements_matrix.flatten(), list(mapping.keys()), list(mapping.values())).reshape(np.shape(elements_matrix)[0], np.shape(elements_matrix)[1])
+    elements_matrix = npi.remap(elements_matrix.flatten(), list(mapping.keys()), list(mapping.values())).reshape(np.shape(elements_matrix)[0], np.shape(elements_matrix)[1])
 
     return elements_matrix
 
