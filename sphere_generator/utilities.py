@@ -115,9 +115,10 @@ def covered_area(circle_centers,dents_radii,surface_width, surface_height,resolu
         radius = dents_radii[k]
         distance_squared = ((X - center[0]) ** 2 + (Y - center[1]) ** 2)
         grid_array += (distance_squared <= radius ** 2).astype(int)
-
-    thresholds = [ 1, 2, 3, 4, 5, 6]  # Threshold values
-
+    
+    #thresholds = [ 1, 2, 3, 4, 5, 6]  # Threshold values
+    thresholds = [i for i in range(max([max(l) for l in grid_array]))] #Threshold values
+    
     percentage_values = []  # List to store the percentages
 
     # Iterate over each threshold
@@ -146,7 +147,7 @@ def visualize_velocity_distribution(velocities):
     Returns:
         None.
     '''
-    plt.figure()
+    plt.figure("Velocity Distribution")
 
     # Calculate histogram as percentage
     counts, bins, patches = plt.hist(velocities, bins=10, density=True)
