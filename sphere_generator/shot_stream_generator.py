@@ -267,7 +267,7 @@ class shot_stream:
         """
         box = self.domain_dimensions
 
-        plt.figure()
+        plt.figure("Covered Area")
         if box.dim_z != 0:
             shots = []  
             for sph in spheres:
@@ -321,7 +321,7 @@ class shot_stream:
 
         if box.dim_z != 0:
 
-            fig = plt.figure()
+            fig = plt.figure("Spheres")
             ax = fig.add_subplot(111, projection='3d')
 
             # Plot each sphere
