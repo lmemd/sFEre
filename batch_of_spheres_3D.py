@@ -87,13 +87,27 @@ def main():
         centers = [(sph.x , sph.z) for sph in spheres_list]
         coverage = stream.calculate_coverage(centers,shot_dents_radii,0.01)
         coverage_list.append(coverage)
+
     
     #Plots
-
-    plt.figure()
+    '''
+    plt.figure("Coverage List") 
     transposed_data = np.transpose(coverage_list)
+    plt.xlabel("Threshold")
+    plt.ylabel("Percentage of points above the threshold")
     for i, item_group in enumerate(transposed_data):
-        plt.plot(item_group, label='Item {}'.format(i + 1))
+        plt.plot(i+1, item_group, "ob", label='Item {}'.format(i + 1))
+    plt.legend()
+    '''
+    plt.figure("Coverage List") 
+    transposed_data = np.transpose(coverage_list)
+    plt.xlabel("Threshold")
+    plt.ylabel("Percentage of points above the threshold")
+    for i, item_group in enumerate(transposed_data):
+        plt.bar(i, item_group, width = 0.8)
+    plt.xticks(range(len(transposed_data)), labels = ['Item {}'.format(i+1) for i in range(len(transposed_data))])
+    
+
 
     #Plot covered area
     stream.plot_coverage(spheres_list,velocity)
