@@ -89,7 +89,7 @@ def main():
         coverage_list.append(coverage)
 
     
-    #Plots
+    # Create Plots
     '''
     plt.figure("Coverage List") 
     transposed_data = np.transpose(coverage_list)
@@ -99,13 +99,13 @@ def main():
         plt.plot(i+1, item_group, "ob", label='Item {}'.format(i + 1))
     plt.legend()
     '''
-    plt.figure("Coverage List") 
+    plt.figure("Coverage") 
     transposed_data = np.transpose(coverage_list)
     plt.xlabel("Threshold")
     plt.ylabel("Percentage of points above the threshold")
     for i, item_group in enumerate(transposed_data):
-        plt.bar(i, item_group, width = 0.8)
-    plt.xticks(range(len(transposed_data)), labels = ['Item {}'.format(i+1) for i in range(len(transposed_data))])
+        plt.bar(i, item_group, width = 0.8, color = 'blue')
+    plt.xticks(range(len(transposed_data)), labels = ['{} Spheres'.format(i+1) for i in range(len(transposed_data))])
     
 
 
@@ -121,13 +121,16 @@ def main():
     #if you want to try the new plot3d with huge rendering difference for big numbers of spheres
     # new way of plotting 3D spheres, DOESN'T WORK!!!!
     #stream.plot_spheres_v2(spheres_list, color=(0, 0, 255))
-
-    plt.show()
+    
+    
     
     # Print the X,Y coordinates and the radii of created spheres
     list_to_print = ['%.4f'%s.x + '    ' +  '%.4f'%s.y + '   ' +  '%.4f'%s.z + '    ' +  '%.4f'%s.r for s in spheres]
     list_to_print.insert(0,'X coord    Y coord    Z coord    Radius')
     print(*list_to_print, sep='\n')
+
+    # Show Plots
+    plt.show()
 
 if __name__ == "__main__":
     main()
