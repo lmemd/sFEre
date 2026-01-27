@@ -7,12 +7,13 @@ from FE_mesh.ABAQUS_keyword_manager import output_inp_file_entities
 from FE_mesh.utilities import working_directory
 
 #call this if you want the mesh to be exported to a file
-def export_mesh_geometry(nodes, elements, filename, output_option, pid, mid):
+def export_mesh_geometry(nodes, elements, sphere_dic, filename, output_option, pid, mid):
     """Export mesh geometry to a file.
 
     Args:
         nodes (numpy.ndarray): Nodes array.
         elements (numpy.ndarray): Elements array.
+        sphere_dic: dictionary of containing the nodes of each sphere for a bach.
         filename (str): Output filename.
         pid (int): Property ID
         mid (int): Material ID
@@ -24,7 +25,7 @@ def export_mesh_geometry(nodes, elements, filename, output_option, pid, mid):
     elif output_option == "LSDYNA-entities":
         output_keyword_file(nodes, elements, pid, mid, filename, apply_property=False)
     elif output_option == "ABAQUS":
-        output_inp_file_entities(nodes, elements, pid, mid, filename)
+        output_inp_file_entities(nodes, elements, sphere_dic, pid, mid, filename)
     else:
         print("Please choose a valid output option: general, LSDYNA or LSDYNA-entities.")
 
@@ -41,7 +42,8 @@ def create_mesh_geometry(mesh_method, spacing_method, spheres, element_length, o
         renumbering_point (int): Starting index for renumbering mesh entities.
 
     Returns:
-        tuple: (nodes_array, elements_array) containing node and element data.
+        tuple: (nodes_array, elements_array, sphere_dic) containing node and element data
+                                                         and a dictionary with the nodes of each sphere. 
     """
     
     working_directory(output_path)
@@ -56,8 +58,12 @@ def create_mesh_geometry(mesh_method, spacing_method, spheres, element_length, o
     nodes_all = np.reshape(np.zeros((1, 4)), (1, 4))
     elements_all = np.reshape(np.zeros((1, 9)), (1, 9))
 
+    sphere_no = 0 # counter for the current sphere number in the bach
+    spheres_dic = {} # dictionary for the nodes of each sphere
+
     for s in spheres:
         [nodes_s_tmp, elements_s_tmp] = sphere_entity(mesh_method, spacing_method, s.r, element_length, s.x, s.y, s.z)
+                
 
         # renumber indexes of elements and nodes ids
         nodes_s_tmp[:, 0] += np.shape(nodes_all)[0] - 1 # here we dont need + 1 
@@ -69,6 +75,10 @@ def create_mesh_geometry(mesh_method, spacing_method, spheres, element_length, o
         nodes_all = np.vstack((nodes_all, nodes_s_tmp))
         elements_all = np.vstack((elements_all, elements_s_tmp))
 
+        sphere_no += 1
+        spheres_dic['sphere_{}'.format(sphere_no)] = nodes_s_tmp + renumbering_point 
+        # 
+
     # deleting useless first row of matrices
     nodes_all = np.delete(nodes_all, 0, 0)
     elements_all = np.delete(elements_all, 0, 0)
@@ -77,6 +87,6 @@ def create_mesh_geometry(mesh_method, spacing_method, spheres, element_length, o
     elements_all[:, 0] += renumbering_point
     elements_all[:, 1:] += renumbering_point
 
-    return (nodes_all, elements_all)
+    return (nodes_all, elements_all, spheres_dic)
 
         
