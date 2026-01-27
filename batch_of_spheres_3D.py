@@ -1,6 +1,8 @@
-from FE_mesh.configure_shots_mesh import *
-from FE_mesh.LSDYNA_keyword_manager import apply_initial_velocity
-from FE_mesh.ABAQUS_keyword_manager import creat_abq_set
+from FE_mesh.configure_shots_mesh import create_mesh_geometry, export_mesh_geometry
+import FE_mesh.LSDYNA_keyword_manager as lsdyna 
+#from FE_mesh.LSDYNA_keyword_manager import apply_initial_velocity
+import FE_mesh.ABAQUS_keyword_manager as abaqus
+#from FE_mesh.ABAQUS_keyword_manager import creat_abq_set
 from sphere_generator.shot_stream_generator import shot_stream
 from sphere_generator.utilities import *
 import os
@@ -11,8 +13,8 @@ def main():
     filename_to_export = "S330_75_batch_no_int_No" # name of sphere file
     mean_radius = 1./2 # average radius of created sphere
     radius_std = 0.135/2 # standard deviation of radius for the created sphere
-    spheres_number = 55 # total number of sphere created
-    spheres_batches = 1 # change this variable if you want to create more than one batch of shots
+    spheres_number = 5 # total number of sphere created
+    spheres_batches = 2 # change this variable if you want to create more than one batch of shots
 
     # Define FE length for spheres
     element_length = 0.04
@@ -21,6 +23,7 @@ def main():
     PID = 100000
     MID = 100000
     solver = 'LSDYNA'
+    #solver = 'ABAQUS'
 
     # Initial velocity applied m/s and velocity configuration
     velocity = 75 
@@ -69,17 +72,27 @@ def main():
         
         # Define FE mesh and spacing method
         # process and output of meshed generated spheres
-        (nodes, elements) = create_mesh_geometry("spherified_cube", "nonlinear", spheres, element_length, directory, renumbering_point=10000000)
+        (nodes, elements, sphere_dic) = create_mesh_geometry("spherified_cube", "nonlinear", spheres, element_length, directory, renumbering_point=10000000)
 
         #Output the entities in selected solver format
-        export_mesh_geometry(nodes, elements, filename, solver, PID, MID) #if you don't want to output geometry to a file, comment this
+        export_mesh_geometry(nodes, elements, sphere_dic, filename, solver, PID, MID) #if you don't want to output geometry to a file, comment this
         
+
+        if solver == 'LSDYNA':
         # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
-        applied_velocity = apply_initial_velocity(filename, "Constant", 
-                                                  *(velocity, velocity_standard_deviation, minimum_velocity, maximum_velocity), 
-                                                  angle = box_angle, dyna_id=PID)
-        
-        velocities_list.append(applied_velocity)
+            applied_velocity = lsdyna.apply_initial_velocity(filename, "Constant", 
+                                                    *(velocity, velocity_standard_deviation, minimum_velocity, maximum_velocity), 
+                                                    angle = box_angle, dyna_id=PID)
+            
+            velocities_list.append(applied_velocity)
+        elif solver == 'ABAQUS':
+            for sphere_id in sphere_dic:
+                sphere_id += '_velocity_nodes'
+                applied_velocity = abaqus.apply_initial_velocity(filename, "Constant", 
+                                                        *(velocity, velocity_standard_deviation, minimum_velocity, maximum_velocity), 
+                                                        angle = box_angle, dyna_id=sphere_id)
+                
+                velocities_list.append(applied_velocity)
 
 
         #Calculate percentage of coverage
@@ -87,8 +100,15 @@ def main():
         centers = [(sph.x , sph.z) for sph in spheres_list]
         coverage = stream.calculate_coverage(centers,shot_dents_radii,0.01)
         coverage_list.append(coverage)
-
-    
+        
+        # Making the coverage_list rows have the same ammount of columns
+        max_len = max(len(i) for i in coverage_list)
+        sq_coverage_list = [[0]*max_len for i in range(len(coverage_list))]
+        for i in range(len(coverage_list)):
+            for j in range(len(coverage_list[i])):
+                sq_coverage_list[i][j] = coverage_list[i][j]
+        coverage_list = sq_coverage_list
+        
     # Create Plots
     '''
     plt.figure("Coverage List") 
@@ -100,12 +120,20 @@ def main():
     plt.legend()
     '''
     plt.figure("Coverage") 
-    transposed_data = np.transpose(coverage_list)
+    #transposed_data = np.transpose(coverage_list)
+    #print(transposed_data)
+    data = coverage_list
     plt.xlabel("Threshold")
-    plt.ylabel("Percentage of points above the threshold")
-    for i, item_group in enumerate(transposed_data):
-        plt.bar(i, item_group, width = 0.8, color = 'blue')
-    plt.xticks(range(len(transposed_data)), labels = ['{} Spheres'.format(i+1) for i in range(len(transposed_data))])
+    plt.ylabel("Percentage of points on the threshold")
+    for batch in range(spheres_batches):
+        '''
+        for i, item_group in enumerate(transposed_data):
+            #plt.bar(i, item_group, width = 0.8, color = 'blue')
+            plt.plot(i, item_group[batch], color = 'b', linestyle = 'solid', marker = 'o')
+        '''
+        plt.plot(range(len(data[batch])), data[batch], linestyle = 'solid', marker = 'o')
+    plt.legend(['Batch {}'.format(b+1) for b in range(spheres_batches)])
+    plt.xticks(range(len(data[0])), labels = ['{} Spheres'.format(i+1) for i in range(len(data[0]))])
     
 
 
