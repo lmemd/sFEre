@@ -30,3 +30,5 @@ stdout, stderr = vsc.communicate()
 To continue with the setup you need to select python version 3.9.13 as an instpreter 
 (CTRL+SHIFT+P --> Python: Select Interpreter --> Python 3.9.13) and then run system_setup_2.py
 '''
+
+# CREATING A VIRTUAL PYTHON ENVIRONMENT USING PYTHON 3.9.13
