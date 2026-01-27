@@ -3,18 +3,20 @@ import os
 from FE_mesh.utilities import working_directory, merge_txt_files
 from sieve_analysis_tools import velocity_stochasticity as vs
 
-def output_inp_file_entities(nodes_s, elements_s, pid, mid, filename):
+def output_inp_file_entities(nodes_s, elements_s, sphere_dic, pid, mid, filename):
     """
     Outputs an ABAQUS .inp file with nodes, elements, and optional initial velocity.
 
     Args:
         nodes_s (array): Nx4 array [node_id, x, y, z].
         elements_s (array): Mx9 array [elem_id, node1, node2, ..., node8].
+        sphere_dic: dictionary of containing the nodes of each sphere for a bach.
         pid (int): Part ID (can be used for material/section assignment).
         mid (int): Material ID
         filename (str): Output filename (without .inp extension).
     """
     
+
     change_path = os.getcwd()
     os.chdir(change_path)
 
@@ -24,32 +26,37 @@ def output_inp_file_entities(nodes_s, elements_s, pid, mid, filename):
                fmt='%d, %.6f, %.6f, %.6f', 
                comments='')
     
+
     elem_fmt = ', '.join(['%d'] * elements_s.shape[1])
     # Save elements using np.savetxt
     np.savetxt('elements.txt', elements_s,
                header="*Element, type=C3D8R, ELSET=P" + str(pid) + ';EALL',
                fmt=elem_fmt,
-               comments='')
+               comments="")
 
     section(pid,mid)
 
-    creat_abq_set(nodes_s)
+    creat_abq_set(sphere_dic)
 
     # Create .inp file by merging
     filenames = ['nodes.txt', 'elements.txt', 'section.txt', 'material.txt', 'node_set.txt']
     merge_txt_files(filenames, '%s.inp' %filename)
-
+    
+    
     for fname in filenames:
         if os.path.exists(fname):
             os.remove(fname)
-
+    
+    
     #changing path in order to produce multiple batches
     os.chdir(change_path)
 
 
 def section(PID, MID = 1000000):
+
+
     """This function defines a section, which 
-    is needed for LS - DYNA keyword file format.
+    is needed for ABAQUS keyword file format.
 
     Args:
         PID (int): Property's identification number.
@@ -67,12 +74,14 @@ def section(PID, MID = 1000000):
         outfile2.close()
 
 
-def creat_abq_set(nodes_s):
+def creat_abq_set(sphere_dic):
     """
-    Create an Abaqus node set file from a list of nodes.
+    Create an Abaqus node set file a dictionary cointaining the nodes of each element.
 
-    This function extracts the first column (assumed to contain node IDs) 
-    from the input array, reshapes it into rows of 10 elements, and writes 
+    xxxx This function extracts the first column (assumed to contain node IDs) 
+    For each sphere in the input dictionary there exists a column of node IDs.
+    xxxx from the input array, reshapes it into rows of 10 elements, and writes 
+    The function takes it, reshapes it into rows of 10 elements, and writes
     the node IDs to a text file ('node_set.txt') in Abaqus NSET format.
 
     If the number of node IDs is not a multiple of 10, the array is padded 
@@ -97,27 +106,31 @@ def creat_abq_set(nodes_s):
 
     change_path = os.getcwd()
     os.chdir(change_path)
-    
-    node_ids = nodes_s[:,0]
-    
 
-    n = node_ids.size
-    pad_size = (10 - n % 10) % 10
-    padded = np.pad(node_ids, (0, pad_size), mode='constant', constant_values = np.nan)
+    with open("node_set.txt", "w") as f: 
 
-    node_ids_reshaped = padded.reshape(-1,10)
+        for sphere_id in sphere_dic:
+            node_ids = sphere_dic[sphere_id][:,0]
+            
 
-    with open("node_set.txt", "w") as f:
-        f.write("*NSET, NSET=velocity_nodes\n")
-        for row in node_ids_reshaped:
-            valid_numbers = [str(int(x)) for x in row if not np.isnan(x)]
-            if valid_numbers:
-                f.write(", ".join(valid_numbers) + "\n")
+            n = node_ids.size
+            pad_size = (10 - n % 10) % 10
+            padded = np.pad(node_ids, (0, pad_size), mode='constant', constant_values = np.nan)
+
+            node_ids_reshaped = padded.reshape(-1,10)
+
+        
+            f.write("*NSET, NSET={}_velocity_nodes\n".format(sphere_id))       
+            for row in node_ids_reshaped:
+                valid_numbers = [str(int(x)) for x in row if not np.isnan(x)]
+                if valid_numbers:
+                    f.write(", ".join(valid_numbers) + "\n")
 
 
 
 def initial_velocity(NSET, velocity, angle):
-    """This function creates initial velocity entity
+    """
+    This function creates initial velocity entity
     and assigns it to elements, nodes etc.
 
     Args:
