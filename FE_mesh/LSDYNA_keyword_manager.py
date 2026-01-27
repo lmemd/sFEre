@@ -54,7 +54,7 @@ def initial_velocity(PID, velocity, angle):
             outfile.write("%i,    " %PID + "2,    " + "0,    " + "%0.3f,    "%-vx
             + "%0.1f,    " %-vy + "0,    " + "0,    " + "0,    " + "\n")
             outfile.write("0,    " + "0,    " + "0,     " + "0,    " + "0,    " + "0,    " + "0,    " + "0,    " + "\n")
-            outfile.write("*END")
+            outfile.write("*END \n")
 
             variable = True
         else:
@@ -86,6 +86,7 @@ def output_keyword_file(nodes_s, elements_s, pid, mid, filename, apply_property 
     #insert the column for the PID 
     pid_column = np.full((elements_s.shape[0],), pid)
     elements_s_new = np.insert(elements_s, 1, pid_column, axis=1)
+    #elements_s_new = ', '.join(['%d'] * elements_s.shape[1])
 
     # creating txt files (NEEDS TO BE FIXED)
     np.savetxt('elements.txt', elements_s_new, header="*ELEMENT_SOLID", fmt="%8i%8i%8i%8i%8i%8i%8i%8i%8i%8i", comments="")
