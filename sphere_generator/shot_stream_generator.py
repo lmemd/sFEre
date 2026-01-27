@@ -77,12 +77,12 @@ class shot_stream:
                 number_of_spheres_setter = 1, 
                 problem_dimensions_setter = 3, 
                 domain_dimensions_setter = None,
-                impact_angle_setter = 0.0,
-                box_offset_dists_setter = (0,0,0),     
+                impact_angle_setter = 0.0,   
                 mean_radius_setter= 0.0,
                 radius_standard_deviation_setter = 0.0, 
+                box_offset_dists_setter = [0, 0, 0]
                 ):
-
+        
 
         """Initialize attributes with given values
         """
@@ -91,6 +91,8 @@ class shot_stream:
         self.impact_angle = impact_angle_setter
         self.box_offset_dists = box_offset_dists_setter
         
+
+
         if isinstance(mean_radius_setter, list):
             self.mean_radius = mean_radius_setter
         else:
@@ -214,7 +216,8 @@ class shot_stream:
                 #create and allocate the sphere in space
                 #####################################################
                 
-                r = random.gauss(m,std)
+                r = abs(random.gauss(m,std))
+                #print('shot stream gen: sphere {0} - radius = {1}'.format(spheres_counter+1,r))
                 s = self.random_sphere_inside_box(r)
                 
                 ######################################################
@@ -304,7 +307,7 @@ class shot_stream:
         Args:
             spheres (list): The spheres list of the shot stream
         """
-        
+
         box = self.domain_dimensions
         
         x_centers = np.empty((0,), dtype=float)
@@ -320,7 +323,6 @@ class shot_stream:
             radii = np.append(radii, sph.r)
 
         if box.dim_z != 0:
-
             fig = plt.figure("Spheres")
             ax = fig.add_subplot(111, projection='3d')
 
