@@ -134,7 +134,6 @@ def sphere_entity(mesh_method, spacing_method, radius, element_length, position_
     sphere_entity = sphere_matrices(mesh_method, half_length, inner_elements, scale_factor, layer_elements, spacing_method, spacing_factor, position_x, position_y, position_z)
 
     print('\x1b[1;37;45m' + "Element length: %f mm." %real_element_length + '\x1b[0m')
-
     return sphere_entity
 
 
