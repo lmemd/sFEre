@@ -65,14 +65,19 @@ def element_length_translator(spacing_method, correction_factor, radius, element
     half_length = radius/scale_factor 
 
     density = correction_factor*radius/element_length
-    if abs(density - np.floor(density)) < 0.25:
-        density = int(np.floor(density))
 
-    elif 0.25 <= abs(density - np.floor(density)) < 0.75:
-        density = int(np.floor(density)) + 0.5
 
-    elif 0.75 <= abs(density - np.floor(density)):
-        density = int(np.ceil(density))
+    if density <= 0.25:
+        density =  0.5
+    else:
+        if abs(density - np.floor(density)) < 0.25:
+            density = int(np.floor(density))
+
+        elif 0.25 <= abs(density - np.floor(density)) < 0.75:
+            density = int(np.floor(density)) + 0.5
+
+        elif 0.75 <= abs(density - np.floor(density)):
+            density = int(np.ceil(density))
 
     inner_elements = density # unchanged parameter
     #scale_factor_for_layers = 2 # this parameter needs tuning!
@@ -83,6 +88,7 @@ def element_length_translator(spacing_method, correction_factor, radius, element
     else:
         add_elements = np.floor(density/2) + 1
         layer_elements = int(density + add_elements)
+    
 
     spacing_length = (radius - radius/scale_factor)/layer_elements
 
