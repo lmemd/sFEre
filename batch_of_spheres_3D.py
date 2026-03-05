@@ -13,7 +13,7 @@ def main():
     filename_to_export = "S330_75_batch_no_int_No" # name of sphere file
     mean_radius = 1./2 # average radius of created sphere
     radius_std = 0.135/2 # standard deviation of radius for the created sphere
-    spheres_number = 5 # total number of sphere created
+    spheres_number = 1 # total number of sphere created
     spheres_batches = 2 # change this variable if you want to create more than one batch of shots
 
     # Define FE length for spheres
@@ -27,9 +27,9 @@ def main():
 
     # Initial velocity applied m/s and velocity configuration
     velocity = 75 
-    velocity_standard_deviation = 0
+    velocity_standard_deviation = 5
     maximum_velocity = velocity
-    minimum_velocity = 75
+    minimum_velocity = 65
 
     # Define the domain characteristics (the space that contains the created spheres)
     box_width = 2.5 # width of the domain containing the spheres (alongside X axis)
@@ -72,21 +72,29 @@ def main():
         
         # Define FE mesh and spacing method
         # process and output of meshed generated spheres
-        (nodes, elements, sphere_dic) = create_mesh_geometry("spherified_cube", "nonlinear", spheres, element_length, directory, renumbering_point=10000000)
+        (nodes, elements, spheres_dic) = create_mesh_geometry("spherified_cube", "nonlinear", spheres, element_length, directory, renumbering_point=10000000, sphere_renumbering_point=3000000)
 
         #Output the entities in selected solver format
-        export_mesh_geometry(nodes, elements, sphere_dic, filename, solver, PID, MID) #if you don't want to output geometry to a file, comment this
+        export_mesh_geometry(nodes, elements, spheres_dic, filename, solver, PID, MID) #if you don't want to output geometry to a file, comment this
         
 
         if solver == 'LSDYNA':
         # Call this function if you want to apply initial velocity to the shot stream, in LSDYNA keyword format.
-            applied_velocity = lsdyna.apply_initial_velocity(filename, "Constant", 
+            '''applied_velocity = lsdyna.apply_initial_velocity(filename, "Constant", 
                                                     *(velocity, velocity_standard_deviation, minimum_velocity, maximum_velocity), 
                                                     angle = box_angle, dyna_id=PID)
             
-            velocities_list.append(applied_velocity)
+            velocities_list.append(applied_velocity)'''
+            for sphere_id in spheres_dic:
+                sphere_id = spheres_dic[sphere_id]['set_id']
+                applied_velocity = lsdyna.apply_initial_velocity(filename, "Constant", 
+                                                    *(velocity, velocity_standard_deviation, minimum_velocity, maximum_velocity), 
+                                                    angle = box_angle, dyna_id=sphere_id)
+            
+                velocities_list.append(applied_velocity)
+            
         elif solver == 'ABAQUS':
-            for sphere_id in sphere_dic:
+            for sphere_id in spheres_dic:
                 sphere_id += '_velocity_nodes'
                 applied_velocity = abaqus.apply_initial_velocity(filename, "Constant", 
                                                         *(velocity, velocity_standard_deviation, minimum_velocity, maximum_velocity), 
