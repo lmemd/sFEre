@@ -3,14 +3,14 @@ import os
 from FE_mesh.utilities import working_directory, merge_txt_files
 from sieve_analysis_tools import velocity_stochasticity as vs
 
-def output_inp_file_entities(nodes_s, elements_s, sphere_dic, pid, mid, filename):
+def output_inp_file_entities(nodes_s, elements_s, spheres_dic, pid, mid, filename):
     """
     Outputs an ABAQUS .inp file with nodes, elements, and optional initial velocity.
 
     Args:
         nodes_s (array): Nx4 array [node_id, x, y, z].
         elements_s (array): Mx9 array [elem_id, node1, node2, ..., node8].
-        sphere_dic: dictionary of containing the nodes of each sphere for a bach.
+        spheres_dic: dictionary of containing the nodes of each sphere for a bach.
         pid (int): Part ID (can be used for material/section assignment).
         mid (int): Material ID
         filename (str): Output filename (without .inp extension).
@@ -36,7 +36,8 @@ def output_inp_file_entities(nodes_s, elements_s, sphere_dic, pid, mid, filename
 
     section(pid,mid)
 
-    creat_abq_set(sphere_dic)
+    # Creating nodes.txt file
+    create_abq_set(spheres_dic)
 
     # Create .inp file by merging
     filenames = ['nodes.txt', 'elements.txt', 'section.txt', 'material.txt', 'node_set.txt']
@@ -74,7 +75,7 @@ def section(PID, MID = 1000000):
         outfile2.close()
 
 
-def creat_abq_set(sphere_dic):
+def create_abq_set(spheres_dic):
     """
     Create an Abaqus node set file a dictionary cointaining the nodes of each element.
 
@@ -109,10 +110,11 @@ def creat_abq_set(sphere_dic):
 
     with open("node_set.txt", "w") as f: 
 
-        for sphere_id in sphere_dic:
-            node_ids = sphere_dic[sphere_id][:,0]
+        for sphere_id in spheres_dic:
+            node_ids = spheres_dic[sphere_id]['node_ids'][:,0]
             
 
+            # Reshaping the nodes matrix
             n = node_ids.size
             pad_size = (10 - n % 10) % 10
             padded = np.pad(node_ids, (0, pad_size), mode='constant', constant_values = np.nan)
