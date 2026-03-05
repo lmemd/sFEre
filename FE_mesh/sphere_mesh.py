@@ -66,9 +66,17 @@ def element_length_translator(spacing_method, correction_factor, radius, element
 
     density = correction_factor*radius/element_length
 
-
-    if density <= 0.25:
+    rad_std_warn = False
+    if density <= 0.25: # This part is changing the randomness, so it is statistically wrong
         density =  0.5
+        if not rad_std_warn:
+            print("WARNING\n" \
+            "The standard daviation of the sphere radius is high, " \
+            "leading to density values of the sphere mesh equal to or less than zero.\n" \
+            "Any density values of that range are going to automatically take the value of 0.5mm, " \
+            "which will affect the randomality of the model. \n" \
+            "For better results statistcaly, please enter a smaller value for the standard deviation.")
+            rad_std_warn =True
     else:
         if abs(density - np.floor(density)) < 0.25:
             density = int(np.floor(density))
