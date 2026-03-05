@@ -12,9 +12,10 @@ def section(PID, MID, ELFORM = 1):
         MID (int, optional): Material's identification number (default is 1000000).
         ELFORM (int, optional): Element's integration scheme (reduced[default] or full).
     """
+    '''
     with open('section.txt', 'w') as outfile1, open('material.txt', 'w') as outfile2:
         outfile1.write("*PART" +  '\n' + 'SECTION_SOLID' + '\n')
-        outfile1.write('  %d' %PID + ',    '+ '%d' %PID + ',    ' + '%d' %MID + ',    ' + '0,    0,    0,    0,    0,    0,    %d'%ELFORM + '\n')
+        outfile1.write((11-len(str(PID)))*' ' + '%d' %PID + ',' +(11-len(str(PID)))*' ' + '%d' %PID + ',' + (11-len(str(MID)))*' ' + '%d' %MID + ',    ' + '0,    0,    0,    0,    0,\n    0,    %d'%ELFORM + '\n')
 
         outfile1.write("*SECTION_SOLID_TITLE" +  '\n' + 'SECTION_SOLID' + '\n')
         outfile1.write('  %d' %PID + ',    '+ '%d' %MID + '\n')
@@ -24,6 +25,20 @@ def section(PID, MID, ELFORM = 1):
 
         outfile1.close()
         outfile2.close()
+    '''
+    with open('section.txt', 'w') as outfile1, open('material.txt', 'w') as outfile2:
+        outfile1.write("*PART" +  '\n' + 'SECTION_SOLID' + '\n')
+        outfile1.write((11-len(str(PID)))*' ' + '%d' %PID + ',' +(11-len(str(PID)))*' ' + '%d' %PID + ',' + (11-len(str(MID)))*' ' + '%d' %MID + '\n')
+
+        outfile1.write("*SECTION_SOLID_TITLE" +  '\n' + 'SECTION_SOLID' + '\n')
+        outfile1.write('  %d' %PID + ',    '+ '%d' %ELFORM + '\n')
+
+        outfile2.write("*MAT_ELASTIC_TITLE" +  '\n' + 'Default MAT1 MAT_ELASTIC' + '\n')
+        outfile2.write('  %d'% MID + ',    '+ '7.85E-6,    '+ '210.,    ' + '0.3' + '\n')
+
+        outfile1.close()
+        outfile2.close()
+
 
 
 def initial_velocity(PID, velocity, angle):
@@ -51,11 +66,10 @@ def initial_velocity(PID, velocity, angle):
             vy = velocity*np.cos(np.pi/2 - impact_angle_rads)
 
             outfile.write("*INITIAL_VELOCITY_GENERATION" + "\n")
-            outfile.write("%i,    " %PID + "2,    " + "0,    " + "%0.3f,    "%-vx
-            + "%0.1f,    " %-vy + "0,    " + "0,    " + "0,    " + "\n")
-            outfile.write("0,    " + "0,    " + "0,     " + "0,    " + "0,    " + "0,    " + "0,    " + "0,    " + "\n")
-            outfile.write("*END \n")
-
+            outfile.write("%i,    " %PID + "3,    " + "0,    " + "%0.3f,    "%-vx
+            + "%0.1f,    " %-vy + "0,    " + "0,    " + "0    " + "\n")
+            outfile.write("0,    " + "0,    " + "0,     " + "0,    " + "0,    " + "0,    " + "0,    " + "0    " + "\n")
+            
             variable = True
         else:
             variable = False
@@ -65,13 +79,14 @@ def initial_velocity(PID, velocity, angle):
     return variable
 
 
-def output_keyword_file(nodes_s, elements_s, pid, mid, filename, apply_property = True):
+def output_keyword_file(nodes_s, elements_s, spheres_dic, pid, mid, filename, apply_property = True):
     """Function which outputs the final keyword file
     including sphere entity.
 
     Args:
         nodes_s (array): Nodes matrix.
         elements_s (array): Elements matrix.
+        spheres_dic: dictionary of containing the nodes of each sphere for a bach.
         pid (int): Described before.
         mid (int): Material ID
         filename (string): Final output name.
@@ -88,13 +103,18 @@ def output_keyword_file(nodes_s, elements_s, pid, mid, filename, apply_property 
     elements_s_new = np.insert(elements_s, 1, pid_column, axis=1)
     #elements_s_new = ', '.join(['%d'] * elements_s.shape[1])
 
-    # creating txt files (NEEDS TO BE FIXED)
+    # creating elements.txt file (NEEDS TO BE FIXED)
     np.savetxt('elements.txt', elements_s_new, header="*ELEMENT_SOLID", fmt="%8i%8i%8i%8i%8i%8i%8i%8i%8i%8i", comments="")
-    np.savetxt('nodes.txt', nodes_s, header="*KEYWORD\n*NODES", fmt="%i,%f,%f,%f", comments="")
     
+    # creating nodes.txt file (Might need to be fixed)
+    np.savetxt('nodes.txt', nodes_s, header="*KEYWORD\n*NODES", fmt="%i,%f,%f,%f", comments="")
+   
+    # creating node_set.txt file
+    create_lsdyna_set(spheres_dic)
+        
     if apply_property:
         section(pid,mid)
-        filenames = ['nodes.txt', 'elements.txt', 'section.txt', 'material.txt']
+        filenames = ['nodes.txt', 'elements.txt', 'section.txt', 'material.txt', 'node_set.txt']
     else:
         filenames = ['nodes.txt', 'elements.txt']
         
@@ -132,7 +152,7 @@ def output_general_file(nodes_s, elements_s, filename, ending = ".txt"):
     elem_fmt = ', '.join(['%d'] * elements_all_filtered.shape[1])
     np.savetxt('elements.txt', elements_all_filtered, header="*ELEMENT_SOLID", fmt=elem_fmt, footer="*END", comments="")
 
-    filenames = ['nodes.txt', 'elements.txt']
+    filenames = ['nodes.txt', 'elements.txt', 'node_set.txt']
     merge_txt_files(filenames, '%s%s' %(filename, ending))
 
     for fname in filenames:
@@ -143,6 +163,66 @@ def output_general_file(nodes_s, elements_s, filename, ending = ".txt"):
     os.chdir(change_path)
 
     
+def create_lsdyna_set(spheres_dic):
+    """
+    Create an Abaqus node set file a dictionary cointaining the nodes of each element.
+
+    xxxx This function extracts the first column (assumed to contain node IDs) 
+    For each sphere in the input dictionary there exists a column of node IDs.
+    xxxx from the input array, reshapes it into rows of 8 elements, and writes 
+    The function takes it, reshapes it into rows of 8 elements, and writes
+    the node IDs to a text file ('node_set.txt') in Abaqus NSET format.
+
+    If the number of node IDs is not a multiple of 8, the array is padded 
+    with NaNs for reshaping. These NaNs are then skipped when writing to the file, 
+    so only valid integers are included in the output.
+
+    Parameters
+    ----------
+    nodes_s : np.ndarray
+        A NumPy array of shape (N, ≥1) where the first column contains node IDs.
+
+    Output
+    ------
+    A file named 'node_set.txt' is created in the current working directory,
+    formatted according to LSDYNA SET_NODE specifications.
+
+    Example output:
+        *SET_NODE_{LIST}
+        set_ID = velocity_nodes
+        1, 2, 3, 4, 5, 6, 7, 8
+        9, 10, 11
+    """
+
+    change_path = os.getcwd()
+    os.chdir(change_path)
+
+    with open("node_set.txt", "w") as f: 
+
+        for sphere_id in spheres_dic:
+            node_ids = spheres_dic[sphere_id]['node_ids'][:,0]
+            
+
+            # Reshaping the nodes matrix
+            n = node_ids.size
+            pad_size = (8 - n % 8) % 8
+            padded = np.pad(node_ids, (0, pad_size), mode='constant', constant_values = np.nan)
+
+            node_ids_reshaped = padded.reshape(-1,8)
+
+            #f.write("*SET_NODE \n set_ID={}_velocity_nodes\n".format(sphere_id))
+            f.write("*SET_NODE_LIST_TITLE \n")
+            f.write("{}_velocity_nodes  \n".format(sphere_id))
+            f.write("$ sid  da1 da2 da3 da4 solver\n")
+            f.write("{}, 0.0, 0.0, 0.0, 0.0\n".format(str(spheres_dic[sphere_id]['set_id'])))
+            f.write("$ SET NODE IDs\n")
+            for row in node_ids_reshaped:
+                valid_numbers = [str(int(x)) for x in row if not np.isnan(x)]
+                if valid_numbers:   
+                    f.write(", ".join(valid_numbers) + "\n")
+                    
+
+
 def apply_initial_velocity(filename, velocity_stochasticity_option, *velocity_args, angle, dyna_id = 1):
     """Applies (or not) initial velocity to sphere entities in an LS-DYNA file.
 
