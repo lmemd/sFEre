@@ -21,7 +21,7 @@ def export_mesh_geometry(nodes, elements, sphere_dic, filename, output_option, p
     if output_option == "general":
         output_general_file(nodes, elements, filename)
     elif output_option == "LSDYNA":
-        output_keyword_file(nodes, elements, pid, mid, filename)
+        output_keyword_file(nodes, elements, sphere_dic, pid, mid, filename)
     elif output_option == "LSDYNA-entities":
         output_keyword_file(nodes, elements, pid, mid, filename, apply_property=False)
     elif output_option == "ABAQUS":
@@ -29,7 +29,7 @@ def export_mesh_geometry(nodes, elements, sphere_dic, filename, output_option, p
     else:
         print("Please choose a valid output option: general, LSDYNA or LSDYNA-entities.")
 
-def create_mesh_geometry(mesh_method, spacing_method, spheres, element_length, output_path, renumbering_point = 0):
+def create_mesh_geometry(mesh_method, spacing_method, spheres, element_length, output_path, renumbering_point = 0, sphere_renumbering_point = 0):
     """
     Generates a mesh for multiple spheres using specified mesh and spacing methods.
 
@@ -76,8 +76,10 @@ def create_mesh_geometry(mesh_method, spacing_method, spheres, element_length, o
         elements_all = np.vstack((elements_all, elements_s_tmp))
 
         sphere_no += 1
-        spheres_dic['sphere_{}'.format(sphere_no)] = nodes_s_tmp + renumbering_point 
-        # 
+
+        spheres_dic['sphere_{}'.format(sphere_no)] = {}
+        spheres_dic['sphere_{}'.format(sphere_no)]['node_ids'] = nodes_s_tmp + renumbering_point # Contains the ids of the nodes of each sphere
+        spheres_dic['sphere_{}'.format(sphere_no)]['set_id'] = sphere_no + sphere_renumbering_point # Contains the id of the set of each sphere
 
     # deleting useless first row of matrices
     nodes_all = np.delete(nodes_all, 0, 0)
