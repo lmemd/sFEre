@@ -20,7 +20,7 @@ class Shape:
     def dim_y(self)->float:
         return self._dim_y
     
-    @dim_x.setter
+    @dim_y.setter
     def dim_y(self, dim_y)->None:
         self._dim_y = dim_y
 
@@ -28,7 +28,7 @@ class Shape:
     def dim_z(self)->float:
         return self._dim_z
     
-    @dim_x.setter
+    @dim_z.setter
     def dim_z(self, dim_z)->None:
         self._dim_z = dim_z
     
