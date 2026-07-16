@@ -1,4 +1,4 @@
-                                            ***This goes to everyone who wants to contribute***
+                                               This goes to everyone who wants to contribute
 
 Dear contributors, the standard (and best) way of working in a shared repo is by cloning the repo to your local machine and working in it.
 When you have local changes and you are sure you'll push to your local repo, you also need to push them to the main (remote) repo!
